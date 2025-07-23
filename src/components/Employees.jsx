@@ -53,6 +53,7 @@ function Employees() {
       phone: '555-1234',
       active: true,
       photo: '',
+      notes: 'Empleado destacado por atención al cliente.',
       history: [
         { date: '2025-07-01', action: 'Creado' },
         { date: '2025-07-10', action: 'Actualizado' }
@@ -66,6 +67,7 @@ function Employees() {
       phone: '555-5678',
       active: false,
       photo: '',
+      notes: '',
       history: [
         { date: '2025-07-02', action: 'Creado' }
       ]
@@ -76,7 +78,7 @@ function Employees() {
   const pageSize = 5;
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [form, setForm] = useState({ name: '', cedula: '', role: '', phone: '', active: true, photo: '' });
+  const [form, setForm] = useState({ name: '', cedula: '', role: '', phone: '', active: true, photo: '', notes: '' });
   const [errors, setErrors] = useState({});
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyData, setHistoryData] = useState([]);
@@ -108,11 +110,12 @@ function Employees() {
         role: emp.role,
         phone: emp.phone,
         active: emp.active,
-        photo: emp.photo || ''
+        photo: emp.photo || '',
+        notes: emp.notes || ''
       });
     } else {
       setEditId(null);
-      setForm({ name: '', cedula: '', role: '', phone: '', active: true, photo: '' });
+      setForm({ name: '', cedula: '', role: '', phone: '', active: true, photo: '', notes: '' });
     }
     setErrors({});
     setOpen(true);
@@ -281,6 +284,11 @@ function Employees() {
               <Typography variant="body2" sx={{ color: '#607d8b', mb: 1 }}>Cédula: {emp.cedula}</Typography>
               <Typography variant="body2" sx={{ color: '#607d8b', mb: 1 }}>{emp.role}</Typography>
               <Typography variant="body2" sx={{ color: '#607d8b', mb: 2 }}>Tel: {emp.phone}</Typography>
+              {emp.notes && (
+                <Typography variant="body2" sx={{ color: '#8d5524', mb: 1, fontStyle: 'italic', textAlign: 'center', px: 1 }}>
+                  {emp.notes}
+                </Typography>
+              )}
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                 <Switch
                   checked={emp.active}
@@ -329,6 +337,15 @@ function Employees() {
                 )}
               </Box>
             </Box>
+            <TextField
+              label="Notas o comentarios internos"
+              value={form.notes}
+              onChange={e => setForm({ ...form, notes: e.target.value })}
+              multiline
+              minRows={2}
+              maxRows={4}
+              sx={{ mb: 2, background: '#fff', borderRadius: 2 }}
+            />
             <TextField
               label="Nombre"
               value={form.name}
