@@ -236,22 +236,25 @@ function Employees() {
         <Box sx={{
           display: 'grid',
           gridTemplateColumns: {
-            xs: 'repeat(2, 1fr)',
-            sm: 'repeat(3, 1fr)',
-            md: 'repeat(4, 1fr)',
-            lg: 'repeat(5, 1fr)'
+            xs: '1fr',
+            sm: 'repeat(2, 1fr)',
+            md: 'repeat(3, 1fr)',
+            lg: 'repeat(4, 1fr)',
+            xl: 'repeat(5, 1fr)'
           },
-          gap: 3,
-          mb: 4,
+          gap: { xs: 2, sm: 3 },
+          mt: 0,
+          mb: 0,
           width: '100%',
-          maxWidth: 1200,
-          minHeight: '60vh',
+          maxWidth: { xs: '100%', sm: 600, md: 900, lg: 1200 },
+          minHeight: { xs: 'auto', sm: 'calc(60vh - 32px)' },
           mx: 'auto',
-          px: { xs: 2, sm: 3, md: 4, lg: 4 },
+          px: { xs: 1, sm: 2, md: 3, lg: 4 },
+          overflow: 'hidden',
         }}>
           {paginated.map(emp => (
             <Paper key={emp.id} elevation={3} sx={{
-              p: 3,
+              p: { xs: 2, sm: 3 },
               borderRadius: 3,
               background: '#fff',
               boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
@@ -259,8 +262,8 @@ function Employees() {
               flexDirection: 'column',
               alignItems: 'center',
               aspectRatio: '1 / 1',
-              minWidth: 180,
-              maxWidth: 220,
+              minWidth: { xs: 140, sm: 180 },
+              maxWidth: { xs: 180, sm: 220 },
               width: '100%',
               position: 'relative',
               justifyContent: 'flex-start',

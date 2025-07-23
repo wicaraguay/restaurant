@@ -44,16 +44,28 @@ function App() {
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #f5c16c 100%)', fontFamily: 'Roboto, Arial, sans-serif' }}>
       <CssBaseline />
+      {/* AppBar siempre visible, menú lateral solo en md+ */}
       <AppBar position="fixed" sx={{ zIndex: 1201, background: 'linear-gradient(90deg, #8d5524 60%, #c68642 100%)', boxShadow: 3 }}>
-        <Toolbar>
-          <Typography variant="h5" sx={{ fontWeight: 'bold', letterSpacing: 2, fontFamily: 'Roboto Slab, serif' }}>
+        <Toolbar sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, gap: 2 }}>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', letterSpacing: 2, fontFamily: 'Roboto Slab, serif', flexGrow: 1 }}>
             Restaurante Dashboard
           </Typography>
+          {/* Menú horizontal en xs/sm, oculto en md+ */}
+          <Box sx={{ display: { xs: 'flex', md: 'none' }, gap: 1 }}>
+            {sections.map((section, idx) => (
+              <Button key={section.name} color={selected === idx ? 'secondary' : 'inherit'} onClick={() => setSelected(idx)} sx={{ minWidth: 36, px: 1, fontSize: 14, fontWeight: selected === idx ? 700 : 400 }}>
+                {section.icon}
+                <span style={{ marginLeft: 4 }}>{section.name}</span>
+              </Button>
+            ))}
+          </Box>
         </Toolbar>
       </AppBar>
+      {/* Drawer lateral solo en md+ */}
       <Drawer
         variant="permanent"
         sx={{
+          display: { xs: 'none', md: 'block' },
           width: drawerWidth,
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
@@ -80,11 +92,11 @@ function App() {
           </List>
         </Box>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 4, mt: 8, maxWidth: '100vw' }}>
-        <Container maxWidth="lg" sx={{ boxShadow: 3, borderRadius: 3, background: 'rgba(255,255,255,0.98)', p: 4, minHeight: '70vh' }}>
+      <Box component="main" sx={{ flexGrow: 1, p: { xs: 1, sm: 2, md: 4 }, mt: { xs: 10, sm: 10, md: 8 }, maxWidth: '100vw' }}>
+        <Container maxWidth="xl" sx={{ boxShadow: 3, borderRadius: 3, background: 'rgba(255,255,255,0.98)', p: { xs: 1, sm: 2, md: 4 }, minHeight: { xs: '60vh', md: '70vh' } }}>
           {sections[selected].component}
         </Container>
-        <Box sx={{ textAlign: 'center', py: 3, color: '#8d5524', fontFamily: 'Roboto Slab, serif', fontSize: 18 }}>
+        <Box sx={{ textAlign: 'center', py: 3, color: '#8d5524', fontFamily: 'Roboto Slab, serif', fontSize: { xs: 14, sm: 16, md: 18 } }}>
           © 2025 Restaurante Dashboard
         </Box>
       </Box>
