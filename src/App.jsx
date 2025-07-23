@@ -123,7 +123,7 @@ function App() {
           {sections[selected].component}
         </Container>
         <Box sx={{ textAlign: 'center', py: 3, color: '#8d5524', fontFamily: 'Montserrat, Arial, sans-serif', fontSize: { xs: 14, sm: 16, md: 18 } }}>
-          © 2025 Restaurante Dashboard
+          © {new Date().getFullYear()} Picantería Miraflores - Todos los derechos reservados
         </Box>
       </Box>
     </Box>
