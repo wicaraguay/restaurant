@@ -14,8 +14,8 @@ const rows = [
 
 export default function Tables() {
   return (
-    <div style={{ height: 300, width: '100%' }}>
-      <h2>Gestión de Mesas</h2>
+    <div style={{ height: 300, width: '100%', fontFamily: 'Montserrat, Arial, sans-serif' }}>
+      <h2 style={{ fontFamily: 'Montserrat, Arial, sans-serif', fontWeight: 700 }}>Gestión de Mesas</h2>
       <DataGrid rows={rows} columns={columns} pageSize={5} />
     </div>
   );

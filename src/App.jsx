@@ -45,16 +45,19 @@ function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #f5c16c 100%)', fontFamily: 'Roboto, Arial, sans-serif' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #f5c16c 100%)', fontFamily: 'Montserrat, Arial, sans-serif' }}>
       <CssBaseline />
       {/* AppBar siempre visible, menú lateral solo en md+ */}
-      <AppBar position="fixed" sx={{ zIndex: 1201, background: 'linear-gradient(90deg, #8d5524 60%, #c68642 100%)', boxShadow: 3 }}>
-        <Toolbar sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2, px: { xs: 1, sm: 2, md: 4 } }}>
-          <Typography variant="h5" sx={{ fontWeight: 'bold', letterSpacing: 2, fontFamily: 'Roboto Slab, serif', flexGrow: 1, fontSize: { xs: 18, sm: 22, md: 26 } }}>
-            Restaurante Dashboard
-          </Typography>
+      <AppBar position="fixed" sx={{ zIndex: 1201, background: 'linear-gradient(90deg, #8d5524 60%, #c68642 100%)', boxShadow: 3, fontFamily: 'Montserrat, Arial, sans-serif' }}>
+        <Toolbar sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2, px: { xs: 1, sm: 2, md: 4 }, fontFamily: 'Montserrat, Arial, sans-serif' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexGrow: 1 }}>
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Logo administración" style={{ width: 40, height: 40, borderRadius: 8, background: '#fffbe6', boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }} />
+            <Typography variant="h5" sx={{ fontWeight: 'bold', letterSpacing: 2, fontFamily: 'Montserrat, Arial, sans-serif', fontSize: { xs: 18, sm: 22, md: 26 } }}>
+              Gestor de Restaurante "Picanteria Miraflores"
+            </Typography>
+          </Box>
           {/* Menú hamburguesa en xs/sm, oculto en md+ */}
-          <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center' }}>
+          <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center', fontFamily: 'Montserrat, Arial, sans-serif' }}>
             <IconButton color="inherit" onClick={() => setMobileMenuOpen(true)} sx={{ ml: 1 }}>
               <MenuIcon sx={{ fontSize: 32 }} />
             </IconButton>
@@ -67,16 +70,16 @@ function App() {
         open={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
         sx={{ display: { xs: 'block', md: 'none' }, zIndex: 1300 }}
-        PaperProps={{ sx: { width: 220, background: 'linear-gradient(180deg, #fffbe6 0%, #f5c16c 100%)', pt: 2 } }}
+        PaperProps={{ sx: { width: 220, background: 'linear-gradient(180deg, #fffbe6 0%, #f5c16c 100%)', pt: 2, fontFamily: 'Montserrat, Arial, sans-serif' } }}
       >
-        <List>
+        <List sx={{ fontFamily: 'Montserrat, Arial, sans-serif' }}>
           {sections.map((section, idx) => (
             <ListItem key={section.name} disablePadding>
-              <ListItemButton selected={selected === idx} onClick={() => { setSelected(idx); setMobileMenuOpen(false); }} sx={{ my: 0.5, borderRadius: 2 }}>
+              <ListItemButton selected={selected === idx} onClick={() => { setSelected(idx); setMobileMenuOpen(false); }} sx={{ my: 0.5, borderRadius: 2, fontFamily: 'Montserrat, Arial, sans-serif' }}>
                 <ListItemIcon sx={{ color: selected === idx ? '#8d5524' : '#c68642', minWidth: 36 }}>
                   {section.icon}
                 </ListItemIcon>
-                <ListItemText primary={section.name} sx={{ '& span': { fontWeight: selected === idx ? 'bold' : 'normal', fontFamily: 'Roboto Slab, serif', fontSize: 18 } }} />
+                <ListItemText primary={section.name} sx={{ '& span': { fontWeight: selected === idx ? 'bold' : 'normal', fontFamily: 'Montserrat, Arial, sans-serif', fontSize: 18 } }} />
               </ListItemButton>
             </ListItem>
           ))}
@@ -89,35 +92,37 @@ function App() {
           display: { xs: 'none', md: 'block' },
           width: drawerWidth,
           flexShrink: 0,
+          fontFamily: 'Montserrat, Arial, sans-serif',
           [`& .MuiDrawer-paper`]: {
             width: drawerWidth,
             boxSizing: 'border-box',
             background: 'linear-gradient(180deg, #fffbe6 0%, #f5c16c 100%)',
             borderRight: '1px solid #e0e0e0',
+            fontFamily: 'Montserrat, Arial, sans-serif',
           },
         }}
       >
         <Toolbar />
-        <Box sx={{ overflow: 'auto' }}>
-          <List>
+        <Box sx={{ overflow: 'auto', fontFamily: 'Montserrat, Arial, sans-serif' }}>
+          <List sx={{ fontFamily: 'Montserrat, Arial, sans-serif' }}>
             {sections.map((section, idx) => (
               <ListItem key={section.name} disablePadding>
-                <ListItemButton selected={selected === idx} onClick={() => setSelected(idx)} sx={{ my: 0.5, borderRadius: 2 }}>
+                <ListItemButton selected={selected === idx} onClick={() => setSelected(idx)} sx={{ my: 0.5, borderRadius: 2, fontFamily: 'Montserrat, Arial, sans-serif' }}>
                   <ListItemIcon sx={{ color: selected === idx ? '#8d5524' : '#c68642' }}>
                     {section.icon}
                   </ListItemIcon>
-                  <ListItemText primary={section.name} sx={{ '& span': { fontWeight: selected === idx ? 'bold' : 'normal', fontFamily: 'Roboto Slab, serif', fontSize: 18 } }} />
+                  <ListItemText primary={section.name} sx={{ '& span': { fontWeight: selected === idx ? 'bold' : 'normal', fontFamily: 'Montserrat, Arial, sans-serif', fontSize: 18 } }} />
                 </ListItemButton>
               </ListItem>
             ))}
           </List>
         </Box>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: { xs: 1, sm: 2, md: 4 }, mt: { xs: 10, sm: 10, md: 8 }, maxWidth: '100vw' }}>
-        <Container maxWidth="xl" sx={{ boxShadow: 3, borderRadius: 3, background: 'rgba(255,255,255,0.98)', p: { xs: 1, sm: 2, md: 4 }, minHeight: { xs: '60vh', md: '70vh' } }}>
+      <Box component="main" sx={{ flexGrow: 1, p: { xs: 1, sm: 2, md: 4 }, mt: { xs: 10, sm: 10, md: 8 }, maxWidth: '100vw', fontFamily: 'Montserrat, Arial, sans-serif' }}>
+        <Container maxWidth="xl" sx={{ boxShadow: 3, borderRadius: 3, background: 'rgba(255,255,255,0.98)', p: { xs: 1, sm: 2, md: 4 }, minHeight: { xs: '60vh', md: '70vh' }, fontFamily: 'Montserrat, Arial, sans-serif' }}>
           {sections[selected].component}
         </Container>
-        <Box sx={{ textAlign: 'center', py: 3, color: '#8d5524', fontFamily: 'Roboto Slab, serif', fontSize: { xs: 14, sm: 16, md: 18 } }}>
+        <Box sx={{ textAlign: 'center', py: 3, color: '#8d5524', fontFamily: 'Montserrat, Arial, sans-serif', fontSize: { xs: 14, sm: 16, md: 18 } }}>
           © 2025 Restaurante Dashboard
         </Box>
       </Box>

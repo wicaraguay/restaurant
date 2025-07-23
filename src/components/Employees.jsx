@@ -182,6 +182,7 @@ function Employees() {
       boxSizing: 'border-box',
       padding: { xs: 2, sm: 3, md: 4 },
       margin: 0,
+      fontFamily: 'Montserrat, Arial, sans-serif',
     }}>
       <Box sx={{
         width: '100%',
@@ -194,6 +195,7 @@ function Employees() {
         p: 0,
         m: 0,
         border: 'none',
+        fontFamily: 'Montserrat, Arial, sans-serif',
       }}>
         <Typography variant="h4" sx={{ mb: 4, fontWeight: 700, textAlign: 'center', color: '#2d3a4a', letterSpacing: 1 }}>Gestión de Empleados</Typography>
         <Box sx={{ display: 'flex', gap: 2, mb: 4, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
