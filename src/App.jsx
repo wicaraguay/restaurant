@@ -7,6 +7,8 @@ import Menu from './components/Menu.jsx';
 import Employees from './components/Employees.jsx';
 import Reports from './components/Reports.jsx';
 import AppBar from '@mui/material/AppBar';
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -40,27 +42,46 @@ const sections = [
 
 function App() {
   const [selected, setSelected] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #f5c16c 100%)', fontFamily: 'Roboto, Arial, sans-serif' }}>
       <CssBaseline />
       {/* AppBar siempre visible, menú lateral solo en md+ */}
       <AppBar position="fixed" sx={{ zIndex: 1201, background: 'linear-gradient(90deg, #8d5524 60%, #c68642 100%)', boxShadow: 3 }}>
-        <Toolbar sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, gap: 2 }}>
-          <Typography variant="h5" sx={{ fontWeight: 'bold', letterSpacing: 2, fontFamily: 'Roboto Slab, serif', flexGrow: 1 }}>
+        <Toolbar sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2, px: { xs: 1, sm: 2, md: 4 } }}>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', letterSpacing: 2, fontFamily: 'Roboto Slab, serif', flexGrow: 1, fontSize: { xs: 18, sm: 22, md: 26 } }}>
             Restaurante Dashboard
           </Typography>
-          {/* Menú horizontal en xs/sm, oculto en md+ */}
-          <Box sx={{ display: { xs: 'flex', md: 'none' }, gap: 1 }}>
-            {sections.map((section, idx) => (
-              <Button key={section.name} color={selected === idx ? 'secondary' : 'inherit'} onClick={() => setSelected(idx)} sx={{ minWidth: 36, px: 1, fontSize: 14, fontWeight: selected === idx ? 700 : 400 }}>
-                {section.icon}
-                <span style={{ marginLeft: 4 }}>{section.name}</span>
-              </Button>
-            ))}
+          {/* Menú hamburguesa en xs/sm, oculto en md+ */}
+          <Box sx={{ display: { xs: 'flex', md: 'none' }, alignItems: 'center' }}>
+            <IconButton color="inherit" onClick={() => setMobileMenuOpen(true)} sx={{ ml: 1 }}>
+              <MenuIcon sx={{ fontSize: 32 }} />
+            </IconButton>
           </Box>
         </Toolbar>
       </AppBar>
+      {/* Drawer temporal para menú hamburguesa */}
+      <Drawer
+        anchor="right"
+        open={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        sx={{ display: { xs: 'block', md: 'none' }, zIndex: 1300 }}
+        PaperProps={{ sx: { width: 220, background: 'linear-gradient(180deg, #fffbe6 0%, #f5c16c 100%)', pt: 2 } }}
+      >
+        <List>
+          {sections.map((section, idx) => (
+            <ListItem key={section.name} disablePadding>
+              <ListItemButton selected={selected === idx} onClick={() => { setSelected(idx); setMobileMenuOpen(false); }} sx={{ my: 0.5, borderRadius: 2 }}>
+                <ListItemIcon sx={{ color: selected === idx ? '#8d5524' : '#c68642', minWidth: 36 }}>
+                  {section.icon}
+                </ListItemIcon>
+                <ListItemText primary={section.name} sx={{ '& span': { fontWeight: selected === idx ? 'bold' : 'normal', fontFamily: 'Roboto Slab, serif', fontSize: 18 } }} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Drawer>
       {/* Drawer lateral solo en md+ */}
       <Drawer
         variant="permanent"
