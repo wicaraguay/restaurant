@@ -28,35 +28,44 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 
-const initialMenu = [
-  {
-    id: 1,
-    name: 'Pollo a la brasa',
-    category: 'Plato principal',
-    price: 12.5,
-    description: 'Pollo jugoso acompañado de papas y ensalada.',
-    photo: '',
-    active: true,
-    special: true,
-    history: [
-      { date: '2025-07-01', action: 'Creado' },
-      { date: '2025-07-10', action: 'Actualizado' }
-    ]
-  },
-  {
-    id: 2,
-    name: 'Ceviche mixto',
-    category: 'Entrada',
-    price: 8.0,
-    description: 'Pescado y mariscos frescos en jugo de limón.',
-    photo: '',
-    active: true,
-    special: false,
-    history: [
-      { date: '2025-07-02', action: 'Creado' }
-    ]
-  }
-];
+const initialMenuByDay = {
+  lunes: [
+    {
+      id: 1,
+      name: 'Pollo a la brasa',
+      category: 'Plato principal',
+      price: 12.5,
+      description: 'Pollo jugoso acompañado de papas y ensalada.',
+      photo: '',
+      active: true,
+      special: true,
+      history: [
+        { date: '2025-07-01', action: 'Creado' },
+        { date: '2025-07-10', action: 'Actualizado' }
+      ]
+    }
+  ],
+  martes: [
+    {
+      id: 2,
+      name: 'Ceviche mixto',
+      category: 'Entrada',
+      price: 8.0,
+      description: 'Pescado y mariscos frescos en jugo de limón.',
+      photo: '',
+      active: true,
+      special: false,
+      history: [
+        { date: '2025-07-02', action: 'Creado' }
+      ]
+    }
+  ],
+  miercoles: [],
+  jueves: [],
+  viernes: [],
+  sabado: [],
+  domingo: []
+};
 
 const defaultCategories = [
   { name: 'Entrada', subcategories: ['Fría', 'Caliente'] },
@@ -65,26 +74,17 @@ const defaultCategories = [
   { name: 'Postre', subcategories: [] }
 ];
 
-export default function Menu({ categories, setCategories }) {
+export default function Menu({ categories, setCategories, menuByDay, setMenuByDay, selectedDay, setSelectedDay, currency }) {
   // Edición y eliminación de categorías ahora se gestiona en CategoryManager
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyData, setHistoryData] = useState([]);
-  // Persistencia de menú en localStorage
-  const [menu, setMenu] = useState(() => {
-    const stored = localStorage.getItem('menu');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) return parsed;
-      } catch {}
-    }
-    return initialMenu;
-  });
+  // Día seleccionado
+  // const [selectedDay, setSelectedDay] = useState('lunes');
 
-  // Guardar menú en localStorage cada vez que cambian
+  // Guardar menú por días en localStorage cada vez que cambian
   React.useEffect(() => {
-    localStorage.setItem('menu', JSON.stringify(menu));
-  }, [menu]);
+    localStorage.setItem('menuByDay', JSON.stringify(menuByDay));
+  }, [menuByDay]);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [subcategoryFilter, setSubcategoryFilter] = useState('');
@@ -95,8 +95,8 @@ export default function Menu({ categories, setCategories }) {
   const [page, setPage] = useState(1);
   const pageSize = 6;
 
-  // Filtrado y búsqueda
-  const filtered = menu.filter(item => {
+  // Filtrado y búsqueda por día
+  const filtered = menuByDay[selectedDay].filter(item => {
     const term = search.trim().toLowerCase();
     if (categoryFilter && item.category !== categoryFilter) return false;
     if (subcategoryFilter && item.subcategory !== subcategoryFilter) return false;
@@ -135,7 +135,7 @@ export default function Menu({ categories, setCategories }) {
     setOpen(true);
   };
 
-  // Guardar platillo
+  // Guardar platillo por día
   const handleSave = () => {
     const newErrors = {};
     if (!form.name.trim()) newErrors.name = 'El nombre es obligatorio';
@@ -151,22 +151,31 @@ export default function Menu({ categories, setCategories }) {
     if (!form.description.trim()) newErrors.description = 'La descripción es obligatoria';
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
-    if (editId) {
-      setMenu(menu.map(item =>
-        item.id === editId
-          ? { ...item, ...form, history: [...(item.history || []), { date: new Date().toISOString().slice(0, 10), action: 'Actualizado' }] }
-          : item
-      ));
-    } else {
-      setMenu([
-        ...menu,
-        { ...form, id: crypto.randomUUID(), history: [{ date: new Date().toISOString().slice(0, 10), action: 'Creado' }] }
-      ]);
-    }
+    setMenuByDay(prev => {
+      const platillos = prev[selectedDay] || [];
+      if (editId) {
+        return {
+          ...prev,
+          [selectedDay]: platillos.map(item =>
+            item.id === editId
+              ? { ...item, ...form, history: [...(item.history || []), { date: new Date().toISOString().slice(0, 10), action: 'Actualizado' }] }
+              : item
+          )
+        };
+      } else {
+        return {
+          ...prev,
+          [selectedDay]: [
+            ...platillos,
+            { ...form, id: crypto.randomUUID(), history: [{ date: new Date().toISOString().slice(0, 10), action: 'Creado' }] }
+          ]
+        };
+      }
+    });
     setOpen(false);
   };
 
-  // Eliminar platillo con confirmación
+  // Eliminar platillo con confirmación por día
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
 
@@ -176,7 +185,10 @@ export default function Menu({ categories, setCategories }) {
   };
 
   const handleDeleteConfirm = () => {
-    setMenu(menu.filter(item => item.id !== deleteId));
+    setMenuByDay(prev => ({
+      ...prev,
+      [selectedDay]: prev[selectedDay].filter(item => item.id !== deleteId)
+    }));
     setDeleteDialogOpen(false);
     setDeleteId(null);
   };
@@ -202,11 +214,11 @@ export default function Menu({ categories, setCategories }) {
     doc.save('menu.pdf');
   };
 
-  // Exportar menú a Excel (CSV)
+  // Exportar menú a Excel (CSV) del día
   const handleExportCSV = () => {
     const csvRows = [
       ['Nombre', 'Categoría', 'Precio', 'Descripción', 'Disponible', 'Especial'],
-      ...menu.map(item => [
+      ...menuByDay[selectedDay].map(item => [
         item.name,
         item.category,
         item.price,
@@ -220,23 +232,29 @@ export default function Menu({ categories, setCategories }) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'menu.csv';
+    a.download = `menu_${selectedDay}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
-  // Cambiar estado activo/inactivo
+  // Cambiar estado activo/inactivo por día
   const handleToggleActive = id => {
-    setMenu(menu.map(item =>
-      item.id === id ? { ...item, active: !item.active } : item
-    ));
+    setMenuByDay(prev => ({
+      ...prev,
+      [selectedDay]: prev[selectedDay].map(item =>
+        item.id === id ? { ...item, active: !item.active } : item
+      )
+    }));
   };
 
-  // Cambiar especial
+  // Cambiar especial por día
   const handleToggleSpecial = id => {
-    setMenu(menu.map(item =>
-      item.id === id ? { ...item, special: !item.special } : item
-    ));
+    setMenuByDay(prev => ({
+      ...prev,
+      [selectedDay]: prev[selectedDay].map(item =>
+        item.id === id ? { ...item, special: !item.special } : item
+      )
+    }));
   };
 
   // Manejo de foto
@@ -260,6 +278,19 @@ export default function Menu({ categories, setCategories }) {
       <Typography variant="h4" sx={{ mb: 4, fontWeight: 700, textAlign: 'center', color: '#2d3a4a', letterSpacing: 1 }}>Gestión de Menú</Typography>
       {/* CategoryManager removed: now managed via navigation, not inside Menu */}
       <Box sx={{ display: 'flex', gap: 2, mb: 4, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
+        <FormControl sx={{ minWidth: 160, background: '#fff', borderRadius: 2 }}>
+          <InputLabel id="day-label">Día</InputLabel>
+          <Select
+            labelId="day-label"
+            value={selectedDay}
+            label="Día"
+            onChange={e => { setSelectedDay(e.target.value); setPage(1); }}
+          >
+            {Object.keys(menuByDay).map(day => (
+              <MenuItem key={day} value={day}>{day.charAt(0).toUpperCase() + day.slice(1)}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <TextField
           label="Buscar platillo"
           variant="outlined"

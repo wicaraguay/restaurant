@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import Tables from './components/Tables.jsx';
 import Orders from './components/Orders.jsx';
@@ -49,12 +47,31 @@ function App() {
   const [categories, setCategories] = useState(defaultCategories);
   const [currency, setCurrency] = useState('PEN'); // Default: Soles
   const [roles, setRoles] = useState(['Mesero', 'Cocinero', 'Administrador', 'Cajero']);
+  // Estado global para menú por día y día seleccionado
+  const [menuByDay, setMenuByDay] = useState(() => {
+    const stored = localStorage.getItem('menuByDay');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (typeof parsed === 'object' && parsed !== null) return parsed;
+      } catch {}
+    }
+    return {
+      lunes: [], martes: [], miercoles: [], jueves: [], viernes: [], sabado: [], domingo: []
+    };
+  });
+  const [selectedDay, setSelectedDay] = useState('lunes');
+
+  // Sincronizar cambios del menú por día
+  React.useEffect(() => {
+    localStorage.setItem('menuByDay', JSON.stringify(menuByDay));
+  }, [menuByDay]);
 
   const sections = [
     { name: 'Dashboard', icon: <DashboardIcon />, component: <Box sx={{p:2}}><Typography variant="h4" sx={{fontWeight:'bold',mb:2}}>Bienvenido al Panel de Gestión</Typography><Typography>Selecciona una sección en el menú lateral para comenzar.</Typography></Box> },
     { name: 'Mesas', icon: <TableRestaurantIcon />, component: <Tables /> },
-    { name: 'Pedidos', icon: <ReceiptLongIcon />, component: <Orders /> },
-    { name: 'Menú', icon: <RestaurantMenuIcon />, component: <Menu categories={categories} setCategories={setCategories} currency={currency} /> },
+    { name: 'Pedidos', icon: <ReceiptLongIcon />, component: <Orders menuByDay={menuByDay} selectedDay={selectedDay} /> },
+    { name: 'Menú', icon: <RestaurantMenuIcon />, component: <Menu categories={categories} setCategories={setCategories} menuByDay={menuByDay} setMenuByDay={setMenuByDay} selectedDay={selectedDay} setSelectedDay={setSelectedDay} currency={currency} /> },
     { name: 'Categorías', icon: <CategoryIcon />, component: <CategoryManager categories={categories} setCategories={setCategories} currency={currency} setCurrency={setCurrency} standalone /> },
     { name: 'Roles', icon: <AssignmentIndIcon />, component: <RoleManager roles={roles} setRoles={setRoles} /> },
     { name: 'Empleados', icon: <GroupIcon />, component: <Employees roles={roles} setRoles={setRoles} /> },
