@@ -6,6 +6,7 @@ import Orders from './components/Orders.jsx';
 import Menu from './components/Menu.jsx';
 import Employees from './components/Employees.jsx';
 import Reports from './components/Reports.jsx';
+import CategoryManager from './components/CategoryManager.jsx';
 import AppBar from '@mui/material/AppBar';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -30,19 +31,29 @@ import CssBaseline from '@mui/material/CssBaseline';
 
 
 const drawerWidth = 220;
-const sections = [
-  { name: 'Dashboard', icon: <DashboardIcon />, component: <Box sx={{p:2}}><Typography variant="h4" sx={{fontWeight:'bold',mb:2}}>Bienvenido al Panel de Gestión</Typography><Typography>Selecciona una sección en el menú lateral para comenzar.</Typography></Box> },
-  { name: 'Mesas', icon: <TableRestaurantIcon />, component: <Tables /> },
-  { name: 'Pedidos', icon: <ReceiptLongIcon />, component: <Orders /> },
-  { name: 'Menú', icon: <RestaurantMenuIcon />, component: <Menu /> },
-  { name: 'Empleados', icon: <PeopleIcon />, component: <Employees /> },
-  { name: 'Reportes', icon: <BarChartIcon />, component: <Reports /> },
-];
 
+const defaultCategories = [
+  { name: 'Entrada', subcategories: ['Fría', 'Caliente'] },
+  { name: 'Plato principal', subcategories: ['Carne', 'Pollo', 'Vegetariano'] },
+  { name: 'Bebida', subcategories: ['Fría', 'Caliente'] },
+  { name: 'Postre', subcategories: [] }
+];
 
 function App() {
   const [selected, setSelected] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [categories, setCategories] = useState(defaultCategories);
+
+  const sections = [
+    { name: 'Dashboard', icon: <DashboardIcon />, component: <Box sx={{p:2}}><Typography variant="h4" sx={{fontWeight:'bold',mb:2}}>Bienvenido al Panel de Gestión</Typography><Typography>Selecciona una sección en el menú lateral para comenzar.</Typography></Box> },
+    { name: 'Mesas', icon: <TableRestaurantIcon />, component: <Tables /> },
+    { name: 'Pedidos', icon: <ReceiptLongIcon />, component: <Orders /> },
+    { name: 'Menú', icon: <RestaurantMenuIcon />, component: <Menu categories={categories} setCategories={setCategories} /> },
+    { name: 'Categorías', icon: <RestaurantMenuIcon />, component: <CategoryManager categories={categories} setCategories={setCategories} standalone /> },
+    { name: 'Empleados', icon: <PeopleIcon />, component: <Employees /> },
+    { name: 'Reportes', icon: <BarChartIcon />, component: <Reports /> },
+  ];
+
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', background: 'linear-gradient(135deg, #f8fafc 0%, #f5c16c 100%)', fontFamily: 'Montserrat, Arial, sans-serif' }}>

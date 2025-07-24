@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+// import CategoryManager from './CategoryManager';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import {
@@ -52,34 +53,38 @@ const initialMenu = [
   }
 ];
 
-const defaultCategories = ['Entrada', 'Plato principal', 'Bebida', 'Postre'];
+const defaultCategories = [
+  { name: 'Entrada', subcategories: ['Fría', 'Caliente'] },
+  { name: 'Plato principal', subcategories: ['Carne', 'Pollo', 'Vegetariano'] },
+  { name: 'Bebida', subcategories: ['Fría', 'Caliente'] },
+  { name: 'Postre', subcategories: [] }
+];
 
-export default function Menu() {
-  // Edición y eliminación de categorías
-  const [editCatIndex, setEditCatIndex] = useState(null);
-  const [editCatValue, setEditCatValue] = useState('');
+export default function Menu({ categories, setCategories }) {
+  // Edición y eliminación de categorías ahora se gestiona en CategoryManager
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyData, setHistoryData] = useState([]);
   const [menu, setMenu] = useState(initialMenu);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [subcategoryFilter, setSubcategoryFilter] = useState('');
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [form, setForm] = useState({ name: '', category: '', price: '', description: '', photo: '', active: true, special: false });
+  const [form, setForm] = useState({ name: '', category: '', subcategory: '', price: '', description: '', photo: '', active: true, special: false });
   const [errors, setErrors] = useState({});
   const [page, setPage] = useState(1);
   const pageSize = 6;
-  const [categories, setCategories] = useState(defaultCategories);
-  const [newCategory, setNewCategory] = useState('');
 
   // Filtrado y búsqueda
   const filtered = menu.filter(item => {
     const term = search.trim().toLowerCase();
     if (categoryFilter && item.category !== categoryFilter) return false;
+    if (subcategoryFilter && item.subcategory !== subcategoryFilter) return false;
     if (!term) return true;
     return (
       item.name.toLowerCase().includes(term) ||
       item.category.toLowerCase().includes(term) ||
+      (item.subcategory ? item.subcategory.toLowerCase().includes(term) : false) ||
       item.description.toLowerCase().includes(term)
     );
   });
@@ -93,6 +98,7 @@ export default function Menu() {
       setForm({
         name: item.name,
         category: item.category,
+        subcategory: item.subcategory || '',
         price: item.price,
         description: item.description,
         photo: item.photo || '',
@@ -102,7 +108,7 @@ export default function Menu() {
       setHistoryData(item.history || []);
     } else {
       setEditId(null);
-      setForm({ name: '', category: '', price: '', description: '', photo: '', active: true, special: false });
+      setForm({ name: '', category: '', subcategory: '', price: '', description: '', photo: '', active: true, special: false });
       setHistoryData([]);
     }
     setErrors({});
@@ -114,10 +120,7 @@ export default function Menu() {
     const newErrors = {};
     if (!form.name.trim()) newErrors.name = 'El nombre es obligatorio';
     if (!form.category) newErrors.category = 'La categoría es obligatoria';
-    // Si la categoría es nueva, agregarla a la lista
-    if (form.category && !categories.includes(form.category)) {
-      setCategories(prev => [...prev, form.category]);
-    }
+    if (!form.subcategory) newErrors.subcategory = 'La subcategoría es obligatoria';
     if (!form.price || isNaN(form.price)) {
       newErrors.price = 'El precio es obligatorio y debe ser numérico';
     } else if (Number(form.price) <= 0) {
@@ -235,6 +238,7 @@ export default function Menu() {
   return (
     <Box sx={{ width: '100%', minHeight: 'calc(100vh - 64px)', background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%)', fontFamily: 'Montserrat, Arial, sans-serif', p: { xs: 2, sm: 3, md: 4 } }}>
       <Typography variant="h4" sx={{ mb: 4, fontWeight: 700, textAlign: 'center', color: '#2d3a4a', letterSpacing: 1 }}>Gestión de Menú</Typography>
+      {/* CategoryManager removed: now managed via navigation, not inside Menu */}
       <Box sx={{ display: 'flex', gap: 2, mb: 4, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
         <TextField
           label="Buscar platillo"
@@ -249,11 +253,26 @@ export default function Menu() {
             labelId="cat-label"
             value={categoryFilter}
             label="Categoría"
-            onChange={e => { setCategoryFilter(e.target.value); setPage(1); }}
+            onChange={e => { setCategoryFilter(e.target.value); setSubcategoryFilter(''); setPage(1); }}
           >
             <MenuItem value="">Todas</MenuItem>
             {categories.map(cat => (
-              <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+              <MenuItem key={cat.name} value={cat.name}>{cat.name}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl sx={{ minWidth: 160, background: '#fff', borderRadius: 2 }}>
+          <InputLabel id="subcat-label">Subcategoría</InputLabel>
+          <Select
+            labelId="subcat-label"
+            value={subcategoryFilter}
+            label="Subcategoría"
+            onChange={e => { setSubcategoryFilter(e.target.value); setPage(1); }}
+            disabled={!categoryFilter}
+          >
+            <MenuItem value="">Todas</MenuItem>
+            {categoryFilter && categories.find(c => c.name === categoryFilter)?.subcategories.map(sub => (
+              <MenuItem key={sub} value={sub}>{sub}</MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -450,61 +469,35 @@ export default function Menu() {
               labelId="cat-form-label"
               value={form.category}
               label="Categoría"
-              onChange={e => setForm({ ...form, category: e.target.value })}
+              onChange={e => { setForm({ ...form, category: e.target.value, subcategory: '' }); }}
               required
               error={!!errors.category}
               sx={{ background: '#fff', borderRadius: 2 }}
             >
-              {categories.map((cat, idx) => (
-                <MenuItem key={cat} value={cat}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                    <span>{cat}</span>
-                    <Box>
-                      <Button size="small" color="primary" sx={{ minWidth: 0, px: 1 }} onClick={e => { e.stopPropagation(); setEditCatIndex(idx); setEditCatValue(cat); }}>
-                        Editar
-                      </Button>
-                      <Button size="small" color="error" sx={{ minWidth: 0, px: 1 }} onClick={e => { e.stopPropagation(); setCategories(prev => prev.filter((_, i) => i !== idx)); if (form.category === cat) setForm(f => ({ ...f, category: '' })); }}>
-                        Borrar
-                      </Button>
-                    </Box>
-                  </Box>
-                </MenuItem>
+              {categories.map(cat => (
+                <MenuItem key={cat.name} value={cat.name}>{cat.name}</MenuItem>
               ))}
             </Select>
             {errors.category && <Typography color="error" variant="caption">{errors.category}</Typography>}
           </FormControl>
-          {editCatIndex !== null && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-              <TextField
-                label="Editar categoría"
-                value={editCatValue}
-                onChange={e => setEditCatValue(e.target.value)}
-                sx={{ background: '#fff', borderRadius: 2 }}
-              />
-              <Button variant="contained" color="primary" size="small" onClick={() => {
-                if (editCatValue.trim() && !categories.includes(editCatValue.trim())) {
-                  setCategories(prev => prev.map((c, i) => i === editCatIndex ? editCatValue.trim() : c));
-                  if (form.category === categories[editCatIndex]) setForm(f => ({ ...f, category: editCatValue.trim() }));
-                }
-                setEditCatIndex(null);
-                setEditCatValue('');
-              }}>Guardar</Button>
-              <Button variant="outlined" color="error" size="small" onClick={() => { setEditCatIndex(null); setEditCatValue(''); }}>Cancelar</Button>
-            </Box>
-          )}
-          <TextField
-            label="Nueva categoría (opcional)"
-            value={newCategory}
-            onChange={e => setNewCategory(e.target.value)}
-            onBlur={() => {
-              if (newCategory.trim() && !categories.includes(newCategory.trim())) {
-                setCategories(prev => [...prev, newCategory.trim()]);
-                setForm(f => ({ ...f, category: newCategory.trim() }));
-              }
-            }}
-            sx={{ mb: 2, background: '#fff', borderRadius: 2 }}
-            placeholder="Ejemplo: Sopa, Snack, etc."
-          />
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel id="subcat-form-label">Subcategoría</InputLabel>
+            <Select
+              labelId="subcat-form-label"
+              value={form.subcategory}
+              label="Subcategoría"
+              onChange={e => setForm({ ...form, subcategory: e.target.value })}
+              required
+              error={!!errors.subcategory}
+              sx={{ background: '#fff', borderRadius: 2 }}
+              disabled={!form.category}
+            >
+              {form.category && categories.find(c => c.name === form.category)?.subcategories.map(sub => (
+                <MenuItem key={sub} value={sub}>{sub}</MenuItem>
+              ))}
+            </Select>
+            {errors.subcategory && <Typography color="error" variant="caption">{errors.subcategory}</Typography>}
+          </FormControl>
           <TextField
             label="Precio"
             value={form.price}
