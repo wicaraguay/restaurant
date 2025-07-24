@@ -52,9 +52,12 @@ const initialMenu = [
   }
 ];
 
-const categories = ['Entrada', 'Plato principal', 'Bebida', 'Postre'];
+const defaultCategories = ['Entrada', 'Plato principal', 'Bebida', 'Postre'];
 
 export default function Menu() {
+  // Edición y eliminación de categorías
+  const [editCatIndex, setEditCatIndex] = useState(null);
+  const [editCatValue, setEditCatValue] = useState('');
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyData, setHistoryData] = useState([]);
   const [menu, setMenu] = useState(initialMenu);
@@ -66,6 +69,8 @@ export default function Menu() {
   const [errors, setErrors] = useState({});
   const [page, setPage] = useState(1);
   const pageSize = 6;
+  const [categories, setCategories] = useState(defaultCategories);
+  const [newCategory, setNewCategory] = useState('');
 
   // Filtrado y búsqueda
   const filtered = menu.filter(item => {
@@ -109,6 +114,10 @@ export default function Menu() {
     const newErrors = {};
     if (!form.name.trim()) newErrors.name = 'El nombre es obligatorio';
     if (!form.category) newErrors.category = 'La categoría es obligatoria';
+    // Si la categoría es nueva, agregarla a la lista
+    if (form.category && !categories.includes(form.category)) {
+      setCategories(prev => [...prev, form.category]);
+    }
     if (!form.price || isNaN(form.price)) {
       newErrors.price = 'El precio es obligatorio y debe ser numérico';
     } else if (Number(form.price) <= 0) {
@@ -446,12 +455,56 @@ export default function Menu() {
               error={!!errors.category}
               sx={{ background: '#fff', borderRadius: 2 }}
             >
-              {categories.map(cat => (
-                <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+              {categories.map((cat, idx) => (
+                <MenuItem key={cat} value={cat}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                    <span>{cat}</span>
+                    <Box>
+                      <Button size="small" color="primary" sx={{ minWidth: 0, px: 1 }} onClick={e => { e.stopPropagation(); setEditCatIndex(idx); setEditCatValue(cat); }}>
+                        Editar
+                      </Button>
+                      <Button size="small" color="error" sx={{ minWidth: 0, px: 1 }} onClick={e => { e.stopPropagation(); setCategories(prev => prev.filter((_, i) => i !== idx)); if (form.category === cat) setForm(f => ({ ...f, category: '' })); }}>
+                        Borrar
+                      </Button>
+                    </Box>
+                  </Box>
+                </MenuItem>
               ))}
             </Select>
             {errors.category && <Typography color="error" variant="caption">{errors.category}</Typography>}
           </FormControl>
+          {editCatIndex !== null && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+              <TextField
+                label="Editar categoría"
+                value={editCatValue}
+                onChange={e => setEditCatValue(e.target.value)}
+                sx={{ background: '#fff', borderRadius: 2 }}
+              />
+              <Button variant="contained" color="primary" size="small" onClick={() => {
+                if (editCatValue.trim() && !categories.includes(editCatValue.trim())) {
+                  setCategories(prev => prev.map((c, i) => i === editCatIndex ? editCatValue.trim() : c));
+                  if (form.category === categories[editCatIndex]) setForm(f => ({ ...f, category: editCatValue.trim() }));
+                }
+                setEditCatIndex(null);
+                setEditCatValue('');
+              }}>Guardar</Button>
+              <Button variant="outlined" color="error" size="small" onClick={() => { setEditCatIndex(null); setEditCatValue(''); }}>Cancelar</Button>
+            </Box>
+          )}
+          <TextField
+            label="Nueva categoría (opcional)"
+            value={newCategory}
+            onChange={e => setNewCategory(e.target.value)}
+            onBlur={() => {
+              if (newCategory.trim() && !categories.includes(newCategory.trim())) {
+                setCategories(prev => [...prev, newCategory.trim()]);
+                setForm(f => ({ ...f, category: newCategory.trim() }));
+              }
+            }}
+            sx={{ mb: 2, background: '#fff', borderRadius: 2 }}
+            placeholder="Ejemplo: Sopa, Snack, etc."
+          />
           <TextField
             label="Precio"
             value={form.price}
