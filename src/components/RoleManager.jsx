@@ -142,18 +142,38 @@ export default function RoleManager({ roles, setRoles }) {
           }}
         >
           {roles.map((role, idx) => (
-            <Paper key={role.name || role} sx={{ p: { xs: 1, sm: 2 }, borderRadius: 2 }}>
-              <ListItem sx={{ flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, gap: 1 }}>
+            <Paper
+              key={role.name || role}
+              sx={{
+                p: { xs: 1.5, sm: 2 },
+                borderRadius: 2,
+                boxShadow: 2,
+                width: '100%',
+                display: 'flex',
+                alignItems: 'stretch',
+                minHeight: { xs: 110, sm: 'auto' },
+              }}
+            >
+              <ListItem
+                sx={{
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  gap: 1,
+                  width: '100%',
+                  p: 0,
+                }}
+              >
                 <ListItemText
                   primary={<Typography sx={{ fontWeight: 600, fontSize: { xs: 16, sm: 18 } }}>{role.name || role}</Typography>}
                   secondary={role.privileges && role.privileges.length > 0
                     ? `Privilegios: ${role.privileges.map(p => defaultPrivileges.find(dp => dp.key === p)?.label || p).join(', ')}`
                     : 'Sin privilegios'}
+                  sx={{ width: '100%' }}
                 />
-                <ListItemSecondaryAction sx={{ display: 'flex', gap: 1, position: 'static', mt: { xs: 1, sm: 0 } }}>
+                <Box sx={{ display: 'flex', gap: 1, mt: 1, width: '100%', justifyContent: 'flex-end' }}>
                   <IconButton color="primary" onClick={() => handleOpen(idx)} size="small"><EditIcon /></IconButton>
                   <IconButton color="error" onClick={() => handleDelete(idx)} size="small"><DeleteIcon /></IconButton>
-                </ListItemSecondaryAction>
+                </Box>
               </ListItem>
             </Paper>
           ))}
