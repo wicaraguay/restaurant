@@ -109,7 +109,13 @@ export default function Menu() {
     const newErrors = {};
     if (!form.name.trim()) newErrors.name = 'El nombre es obligatorio';
     if (!form.category) newErrors.category = 'La categoría es obligatoria';
-    if (!form.price || isNaN(form.price)) newErrors.price = 'El precio es obligatorio y debe ser numérico';
+    if (!form.price || isNaN(form.price)) {
+      newErrors.price = 'El precio es obligatorio y debe ser numérico';
+    } else if (Number(form.price) <= 0) {
+      newErrors.price = 'El precio debe ser mayor que cero';
+    } else if (Number(form.price) > 9999) {
+      newErrors.price = 'El precio no debe exceder 9999';
+    }
     if (!form.description.trim()) newErrors.description = 'La descripción es obligatoria';
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
@@ -122,15 +128,30 @@ export default function Menu() {
     } else {
       setMenu([
         ...menu,
-        { ...form, id: Date.now(), history: [{ date: new Date().toISOString().slice(0, 10), action: 'Creado' }] }
+        { ...form, id: crypto.randomUUID(), history: [{ date: new Date().toISOString().slice(0, 10), action: 'Creado' }] }
       ]);
     }
     setOpen(false);
   };
 
-  // Eliminar platillo
-  const handleDelete = id => {
-    setMenu(menu.filter(item => item.id !== id));
+  // Eliminar platillo con confirmación
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+
+  const handleDeleteRequest = id => {
+    setDeleteId(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    setMenu(menu.filter(item => item.id !== deleteId));
+    setDeleteDialogOpen(false);
+    setDeleteId(null);
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setDeleteId(null);
   };
   const handleExportPDF = () => {
     const doc = new jsPDF();
@@ -335,7 +356,7 @@ export default function Menu() {
               <IconButton color="secondary" onClick={() => { setHistoryData(item.history || []); setHistoryOpen(true); }}>
                 <span role="img" aria-label="Historial">🕑</span>
               </IconButton>
-              <IconButton color="error" onClick={() => handleDelete(item.id)}>
+              <IconButton color="error" onClick={() => handleDeleteRequest(item.id)}>
                 <DeleteIcon />
               </IconButton>
             </Box>
@@ -344,6 +365,23 @@ export default function Menu() {
       </Box>
       {/* Modal agregar/editar platillo */}
       {/* Modal historial de cambios */}
+      {/* Modal confirmación de eliminación */}
+      <Dialog open={deleteDialogOpen} onClose={handleDeleteCancel}>
+        <DialogTitle sx={{ fontWeight: 700, color: '#d32f2f', background: '#e0e7ef', borderBottom: '1px solid #cfd8dc' }}>
+          Confirmar eliminación
+        </DialogTitle>
+        <DialogContent sx={{ background: '#f8fafc' }}>
+          <Typography>
+            ¿Está seguro que desea eliminar este platillo? Esta acción no se puede deshacer.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ background: '#e0e7ef', borderTop: '1px solid #cfd8dc' }}>
+          <Button onClick={handleDeleteCancel} sx={{ color: '#2d3a4a', fontWeight: 600 }}>Cancelar</Button>
+          <Button onClick={handleDeleteConfirm} variant="contained" color="error" sx={{ fontWeight: 600 }}>
+            Eliminar
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Dialog open={historyOpen} onClose={() => setHistoryOpen(false)}>
         <DialogTitle sx={{ fontWeight: 700, color: '#2d3a4a', background: '#e0e7ef', borderBottom: '1px solid #cfd8dc' }}>Historial de cambios</DialogTitle>
         <DialogContent sx={{ background: '#f8fafc' }}>
