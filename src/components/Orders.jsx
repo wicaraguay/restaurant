@@ -16,7 +16,10 @@ import {
   InputLabel,
   FormControl,
   Snackbar,
-  Avatar
+  Avatar,
+  Tabs,
+  Tab,
+  Switch
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -28,6 +31,8 @@ import TableRestaurantIcon from '@mui/icons-material/TableRestaurant';
 
 export default function Orders({ menuByDay, selectedDay }) {
   // Estado de pedidos
+  // Estado para el popup de pedido
+  const [pedidoPopup, setPedidoPopup] = useState(null);
   const [orders, setOrders] = useState(() => {
     const stored = localStorage.getItem('orders');
     if (stored) {
@@ -226,18 +231,17 @@ export default function Orders({ menuByDay, selectedDay }) {
           <Typography variant="h6" sx={{ mb: 2, color: '#1976d2', fontWeight: 700 }}>Mesas</Typography>
           <Box
             sx={{
-              display: 'grid',
-              gridTemplateColumns: {
-                xs: '1fr 1fr',
-                sm: '1fr 1fr',
-                md: '1fr',
-              },
-              gap: { xs: 1, sm: 2 },
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: { xs: 1, sm: 2 },
             }}
           >
             {mesas.map(mesa => {
               const pedido = orders.find(o => o.mesa === mesa);
               const isSelected = mesaSeleccionada === mesa;
+              const cliente = pedido?.cliente || '';
+              const tienePedido = !!pedido;
+              const tienePlatillos = pedido && Array.isArray(pedido.platillos) && pedido.platillos.length > 0;
               return (
                 <Paper
                   key={mesa}
@@ -254,15 +258,52 @@ export default function Orders({ menuByDay, selectedDay }) {
                     border: isSelected ? '2px solid #fbc02d' : '2px solid #e0e0e0',
                     minHeight: 120
                   }}
-                  onClick={() => setMesaSeleccionada(isSelected ? null : mesa)}
+                  onClick={() => {
+                    if (tienePedido) {
+                      setPedidoPopup(pedido);
+                    } else {
+                      setPedidoPopup({
+                        id: null,
+                        mesa,
+                        cliente: '',
+                        platillos: [],
+                        estado: 'pendiente',
+                        notas: '',
+                        fecha: new Date().toISOString().slice(0, 16),
+                        tabIndex: 0
+                      });
+                      setMesaSeleccionada(mesa);
+                    }
+                  }}
                 >
-                  <TableRestaurantIcon sx={{ color: pedido ? '#fbc02d' : '#1976d2', fontSize: 36, mb: 1 }} />
-                  <Typography variant="body1" sx={{ fontWeight: 700, color: '#2d3a4a' }}>Mesa {mesa}</Typography>
-                  {pedido ? (
-                    <Chip label={estados.find(e => e.value === pedido.estado)?.label} color={estados.find(e => e.value === pedido.estado)?.color} size="small" sx={{ mt: 1 }} />
-                  ) : (
-                    <Typography variant="caption" sx={{ color: '#bdbdbd', fontStyle: 'italic', mt: 1 }}>Sin pedido</Typography>
-                  )}
+                  <TableRestaurantIcon sx={{ color: tienePedido ? '#fbc02d' : '#1976d2', fontSize: 36, mb: 1 }} />
+                  <Typography variant="body1" sx={{ fontWeight: 700, color: '#2d3a4a', textAlign: 'center' }}>
+                    Mesa {mesa}
+                    {cliente && ` - ${cliente}`}
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 1, width: '100%', mb: 0.5, mt: 1 }}>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        {tienePlatillos
+                          ? <Chip label="Ocupada" color="error" size="small" />
+                          : <Chip label="Disponible" color="success" size="small" />}
+                      </Box>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        {tienePlatillos
+                          ? <Chip label={estados.find(e => e.value === pedido.estado)?.label || 'Pendiente'} color={estados.find(e => e.value === pedido.estado)?.color || 'warning'} size="small" />
+                          : <Typography variant="caption" sx={{ color: '#bdbdbd', fontStyle: 'italic' }}>Sin pedido</Typography>}
+                      </Box>
+                    </Box>
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      sx={{ mb: 1 }}
+                      onClick={e => { e.stopPropagation(); tienePedido && setPedidoPopup(pedido); }}
+                      disabled={!tienePedido}
+                    >
+                      Ver pedido
+                    </Button>
+                  </Box>
                 </Paper>
               );
             })}
@@ -275,36 +316,8 @@ export default function Orders({ menuByDay, selectedDay }) {
           maxWidth: { xs: '100%', md: 800 },
           width: '100%',
         }}>
-          <Typography variant="h6" sx={{ mb: 2, color: '#1976d2', fontWeight: 700 }}>Menú del día ({selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)})</Typography>
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: {
-                xs: '1fr 1fr', // dos columnas en móvil
-                sm: '1fr 1fr', // dos columnas en tablet
-                md: '1fr 1fr 1fr', // tres columnas en desktop
-              },
-              gap: { xs: 1, sm: 2 },
-            }}
-          >
-            {menuByDay[selectedDay].length === 0 ? (
-              <Typography variant="body2" sx={{ color: '#bdbdbd', fontStyle: 'italic', gridColumn: '1/-1' }}>No hay platillos para este día.</Typography>
-            ) : (
-              menuByDay[selectedDay].map(platillo => (
-                <Paper key={platillo.id} elevation={2} sx={{ p: 2, borderRadius: 3, background: platillo.active ? '#fff' : '#f5f5f5', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', alignItems: 'center', opacity: platillo.active ? 1 : 0.5, cursor: platillo.active && mesaSeleccionada ? 'pointer' : 'not-allowed', border: '1px solid #e0e0e0', minHeight: 220 }} onClick={() => platillo.active && mesaSeleccionada && handleAgregarPlatillo(platillo)}>
-                  <Avatar src={platillo.photo} alt={platillo.name} sx={{ width: 64, height: 64, mb: 1, bgcolor: '#e0e7ef', fontWeight: 700, fontSize: 28 }}>
-                    {!platillo.photo && platillo.name.split(' ').map(n => n[0]).join('')}
-                  </Avatar>
-                  <Typography variant="body1" sx={{ fontWeight: 700, color: '#2d3a4a', mb: 0.5 }}>{platillo.name}</Typography>
-                  <Typography variant="body2" sx={{ color: '#607d8b', mb: 0.5 }}>{platillo.category}</Typography>
-                  <Typography variant="body2" sx={{ color: '#388e3c', fontWeight: 600, mb: 0.5 }}>${platillo.price}</Typography>
-                  <Typography variant="caption" sx={{ color: '#607d8b', mb: 1, textAlign: 'center' }}>{platillo.description}</Typography>
-                  <Chip label={platillo.active ? 'Disponible' : 'No disponible'} color={platillo.active ? 'success' : 'default'} size="small" sx={{ mb: 1 }} />
-                  {mesaSeleccionada && platillo.active && <Button size="small" variant="outlined" color="primary" sx={{ mt: 1 }} onClick={e => { e.stopPropagation(); handleAgregarPlatillo(platillo); }}>Agregar</Button>}
-                </Paper>
-              ))
-            )}
-          </Box>
+          {/* <Typography variant="h6" sx={{ mb: 2, color: '#1976d2', fontWeight: 700 }}>Menú del día ({selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)})</Typography> */}
+          {/* Tarjetas de platillos eliminadas, solo se muestra el pedido actual de la mesa seleccionada */}
           {/* Mostrar pedido actual de la mesa seleccionada */}
           {mesaSeleccionada && pedidoMesa && (
             <Box
@@ -321,17 +334,17 @@ export default function Orders({ menuByDay, selectedDay }) {
               }}
             >
               <Typography variant="h6" sx={{ color: '#fbc02d', fontWeight: 700, mb: 1 }}>Pedido de Mesa {mesaSeleccionada}</Typography>
-    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-      <Typography variant="body2" sx={{ color: '#607d8b', mr: 1 }}>Cliente:</Typography>
-      <TextField
-        size="small"
-        variant="outlined"
-        value={pedidoMesa.cliente || ''}
-        onChange={e => setOrders(orders.map(o => o.mesa === mesaSeleccionada ? { ...o, cliente: e.target.value } : o))}
-        placeholder="Nombre del cliente"
-        sx={{ background: '#fff', borderRadius: 2, minWidth: 140 }}
-      />
-    </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                <Typography variant="body2" sx={{ color: '#607d8b', mr: 1 }}>Cliente:</Typography>
+                <TextField
+                  size="small"
+                  variant="outlined"
+                  value={pedidoMesa.cliente || ''}
+                  onChange={e => setOrders(orders.map(o => o.mesa === mesaSeleccionada ? { ...o, cliente: e.target.value } : o))}
+                  placeholder="Nombre del cliente"
+                  sx={{ background: '#fff', borderRadius: 2, minWidth: 140 }}
+                />
+              </Box>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2, width: '100%' }}>
                 {Array.isArray(pedidoMesa.platillos) ? pedidoMesa.platillos.map((p, idx) => {
                   const platillo = menuByDay[selectedDay]?.find(m => m.name === p.name);
@@ -374,6 +387,213 @@ export default function Orders({ menuByDay, selectedDay }) {
           )}
         </Box>
       </Box>
+      {/* Popup para ver pedido */}
+      <Dialog open={!!pedidoPopup} onClose={() => setPedidoPopup(null)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          Pedido de Mesa {pedidoPopup?.mesa}
+          {pedidoPopup && (
+            Array.isArray(pedidoPopup.platillos) && pedidoPopup.platillos.length > 0 ?
+              <Chip label="Ocupada" color="error" size="small" /> :
+              <Chip label="Disponible" color="success" size="small" />
+          )}
+        </DialogTitle>
+        <DialogContent dividers sx={{ p: 0 }}>
+          {pedidoPopup && (
+            <>
+              {/* Tabs para Detalles y Menú */}
+              <Tabs
+                value={pedidoPopup.tabIndex || 0}
+                onChange={(_, newValue) => {
+                  setPedidoPopup({ ...pedidoPopup, tabIndex: newValue });
+                }}
+                indicatorColor="primary"
+                textColor="primary"
+                variant="fullWidth"
+                sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}
+              >
+                <Tab label="Detalles del pedido" />
+                <Tab label="Menú del día" />
+              </Tabs>
+              {/* Contenido de la pestaña Detalles */}
+              {(!pedidoPopup.tabIndex || pedidoPopup.tabIndex === 0) && (
+                <Box sx={{ p: 2 }}>
+                  {/* Cliente editable */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="subtitle2" sx={{ mr: 1 }}>Cliente:</Typography>
+                    <TextField
+                      size="small"
+                      variant="outlined"
+                      value={pedidoPopup.cliente || ''}
+                      onChange={e => {
+                        const nuevo = { ...pedidoPopup, cliente: e.target.value };
+                        setPedidoPopup(nuevo);
+                        setOrders(orders.map(o => o.id === pedidoPopup.id ? { ...o, cliente: e.target.value } : o));
+                      }}
+                      placeholder="Nombre del cliente"
+                      sx={{ background: '#fff', borderRadius: 2, minWidth: 140 }}
+                    />
+                  </Box>
+                  {/* Estado editable */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="subtitle2" sx={{ mr: 1 }}>Estado:</Typography>
+                    <FormControl size="small" sx={{ minWidth: 120 }}>
+                      <Select
+                        value={pedidoPopup.estado}
+                        onChange={e => {
+                          const nuevo = { ...pedidoPopup, estado: e.target.value };
+                          setPedidoPopup(nuevo);
+                          setOrders(orders.map(o => o.id === pedidoPopup.id ? { ...o, estado: e.target.value } : o));
+                        }}
+                      >
+                        {estados.map(e => (
+                          <MenuItem key={e.value} value={e.value}>{e.label}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Box>
+                  {/* Platillos editable */}
+                  <Typography variant="subtitle2" sx={{ mb: 1 }}>Platillos:</Typography>
+                  <Box sx={{ mb: 2 }}>
+                    {Array.isArray(pedidoPopup.platillos) && pedidoPopup.platillos.length > 0 ? pedidoPopup.platillos.map((p, idx) => {
+                      const platillo = menuByDay[selectedDay]?.find(m => m.name === p.name);
+                      return (
+                        <Paper key={idx} sx={{ display: 'flex', alignItems: 'center', p: 1, mb: 1, borderRadius: 2, background: '#f8fafc' }}>
+                          <Typography sx={{ minWidth: 70, fontWeight: 600, fontSize: 14 }}>{p.name}</Typography>
+                          <Button size="small" onClick={() => {
+                            // Disminuir cantidad
+                            if (p.cantidad <= 1) {
+                              // Eliminar platillo
+                              const nuevos = pedidoPopup.platillos.filter((_, i) => i !== idx);
+                              setPedidoPopup({ ...pedidoPopup, platillos: nuevos });
+                              setOrders(orders.map(o => o.id === pedidoPopup.id ? { ...o, platillos: nuevos } : o));
+                            } else {
+                              const nuevos = pedidoPopup.platillos.map((pl, i) => i === idx ? { ...pl, cantidad: pl.cantidad - 1 } : pl);
+                              setPedidoPopup({ ...pedidoPopup, platillos: nuevos });
+                              setOrders(orders.map(o => o.id === pedidoPopup.id ? { ...o, platillos: nuevos } : o));
+                            }
+                          }} sx={{ minWidth: 28, fontWeight: 700, px: 0 }}>-</Button>
+                          <Typography sx={{ mx: 1, minWidth: 20, textAlign: 'center', fontWeight: 600, fontSize: 14 }}>{p.cantidad}</Typography>
+                          <Button size="small" onClick={() => {
+                            // Aumentar cantidad
+                            const nuevos = pedidoPopup.platillos.map((pl, i) => i === idx ? { ...pl, cantidad: pl.cantidad + 1 } : pl);
+                            setPedidoPopup({ ...pedidoPopup, platillos: nuevos });
+                            setOrders(orders.map(o => o.id === pedidoPopup.id ? { ...o, platillos: nuevos } : o));
+                          }} sx={{ minWidth: 28, fontWeight: 700, px: 0 }}>+</Button>
+                          <Button size="small" color="error" onClick={() => {
+                            // Eliminar platillo
+                            const nuevos = pedidoPopup.platillos.filter((_, i) => i !== idx);
+                            setPedidoPopup({ ...pedidoPopup, platillos: nuevos });
+                            setOrders(orders.map(o => o.id === pedidoPopup.id ? { ...o, platillos: nuevos } : o));
+                          }} sx={{ ml: 1, minWidth: 28, px: 0 }}>x</Button>
+                          <Typography sx={{ ml: 2, minWidth: 48, color: '#388e3c', fontWeight: 600, fontSize: 14 }}>
+                            ${platillo ? (platillo.price * p.cantidad).toFixed(2) : '0.00'}
+                          </Typography>
+                        </Paper>
+                      );
+                    }) : <Typography variant="body2" sx={{ color: '#bdbdbd', ml: 1 }}>Sin platillos</Typography>}
+                  </Box>
+                  {/* Notas editable */}
+                  <TextField
+                    label="Notas (opcional)"
+                    value={pedidoPopup.notas || ''}
+                    onChange={e => {
+                      const nuevo = { ...pedidoPopup, notas: e.target.value };
+                      setPedidoPopup(nuevo);
+                      setOrders(orders.map(o => o.id === pedidoPopup.id ? { ...o, notas: e.target.value } : o));
+                    }}
+                    multiline
+                    minRows={2}
+                    maxRows={4}
+                    sx={{ mb: 2, background: '#fff', borderRadius: 2, mt: 2 }}
+                  />
+                  <Typography variant="h6" sx={{ color: '#388e3c', fontWeight: 700, textAlign: 'right', mt: 2 }}>
+                    Total: ${Array.isArray(pedidoPopup.platillos) ? pedidoPopup.platillos.reduce((acc, p) => {
+                      const platillo = menuByDay[selectedDay]?.find(m => m.name === p.name);
+                      return platillo ? acc + Number(platillo.price || 0) * (p.cantidad || 1) : acc;
+                    }, 0).toFixed(2) : '0.00'}
+                  </Typography>
+                </Box>
+              )}
+              {/* Contenido de la pestaña Menú del día */}
+              {pedidoPopup.tabIndex === 1 && (
+                <Box sx={{ p: 2 }}>
+                  <Typography variant="h6" sx={{ color: '#1976d2', fontWeight: 700, mb: 2 }}>
+                    Menú del día: {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}
+                  </Typography>
+                  <Box sx={{
+                    display: 'grid',
+                    gridTemplateColumns: {
+                      xs: '1fr 1fr',
+                      sm: '1fr 1fr',
+                      md: '1fr 1fr 1fr',
+                    },
+                    gap: { xs: 1, sm: 2 },
+                  }}>
+                    {menuByDay[selectedDay]?.length === 0 ? (
+                      <Typography variant="body2" sx={{ color: '#bdbdbd', fontStyle: 'italic', gridColumn: '1/-1' }}>No hay platillos para este día.</Typography>
+                    ) : (
+                      menuByDay[selectedDay].map(platillo => {
+                        const yaEnPedido = pedidoPopup.platillos.some(pl => pl.name === platillo.name);
+                        return (
+                          <Paper key={platillo.id} elevation={2} sx={{ p: 2, borderRadius: 3, background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', alignItems: 'center', opacity: platillo.active ? 1 : 0.5, cursor: yaEnPedido ? 'not-allowed' : 'pointer', border: '1px solid #e0e0e0', minHeight: 180 }}>
+                            <Avatar src={platillo.photo} alt={platillo.name} sx={{ width: 48, height: 48, mb: 1, bgcolor: '#e0e7ef', fontWeight: 700, fontSize: 20 }}>
+                              {!platillo.photo && platillo.name.split(' ').map(n => n[0]).join('')}
+                            </Avatar>
+                            <Typography variant="body1" sx={{ fontWeight: 700, color: '#2d3a4a', mb: 0.5 }}>{platillo.name}</Typography>
+                            <Typography variant="body2" sx={{ color: '#607d8b', mb: 0.5 }}>{platillo.category}</Typography>
+                            <Typography variant="body2" sx={{ color: '#388e3c', fontWeight: 600, mb: 0.5 }}>${platillo.price}</Typography>
+                            <Typography variant="caption" sx={{ color: '#607d8b', mb: 1, textAlign: 'center' }}>{platillo.description}</Typography>
+                            <Chip label={platillo.active ? 'Disponible' : 'No disponible'} color={platillo.active ? 'success' : 'default'} size="small" sx={{ mb: 1 }} />
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              color="primary"
+                              sx={{ mt: 1 }}
+                              disabled={yaEnPedido || !platillo.active}
+                              onClick={() => {
+                                if (yaEnPedido || !platillo.active) return;
+                                const nuevos = [...pedidoPopup.platillos, { name: platillo.name, cantidad: 1 }];
+                                if (pedidoPopup.id) {
+                                  // Pedido ya existe, actualizar platillos y estado a 'pendiente'
+                                  setPedidoPopup({ ...pedidoPopup, platillos: nuevos, estado: 'pendiente' });
+                                  setOrders(orders.map(o => o.id === pedidoPopup.id ? { ...o, platillos: nuevos, estado: 'pendiente' } : o));
+                                } else {
+                                  // Es un pedido nuevo (mesa estaba disponible), crear pedido en orders
+                                  const nuevoPedido = {
+                                    id: crypto.randomUUID(),
+                                    mesa: pedidoPopup.mesa,
+                                    cliente: pedidoPopup.cliente,
+                                    platillos: nuevos,
+                                    estado: 'pendiente',
+                                    notas: pedidoPopup.notas,
+                                    fecha: new Date().toISOString().slice(0, 16)
+                                  };
+                                  const nuevosOrders = [...orders, nuevoPedido];
+                                  setOrders(nuevosOrders);
+                                  setPedidoPopup(nuevoPedido);
+                                }
+                              }}
+                            >
+                              {yaEnPedido ? 'Agregado' : 'Agregar'}
+                            </Button>
+                          </Paper>
+                        );
+                      })
+                    )}
+                  </Box>
+                </Box>
+              )}
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {
+            setPedidoPopup(null);
+            setMesaSeleccionada(null);
+          }} color="primary" variant="contained">Cerrar</Button>
+        </DialogActions>
+      </Dialog>
+
       <Snackbar
         open={snackbar.open}
         autoHideDuration={2500}
