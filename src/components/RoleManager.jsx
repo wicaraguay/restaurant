@@ -123,36 +123,51 @@ export default function RoleManager({ roles, setRoles }) {
   };
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 500, mx: 'auto', mt: 4 }}>
+    <Box sx={{
+      width: '100%',
+      maxWidth: { xs: '100%', sm: 500 },
+      mx: 'auto',
+      mt: { xs: 2, sm: 4 },
+      px: { xs: 1, sm: 2 },
+      boxSizing: 'border-box',
+    }}>
       <Typography variant="h5" sx={{ mb: 2, fontWeight: 700, textAlign: 'center', color: '#2d3a4a' }}>Gestión de Roles y Privilegios</Typography>
-      <Button variant="contained" color="primary" onClick={() => handleOpen()} sx={{ mb: 2 }}>Agregar rol</Button>
-      <List>
-        {roles.map((role, idx) => (
-          <Paper key={role.name || role} sx={{ mb: 2, p: 2 }}>
-            <ListItem>
-              <ListItemText
-                primary={role.name || role}
-                secondary={role.privileges && role.privileges.length > 0
-                  ? `Privilegios: ${role.privileges.map(p => defaultPrivileges.find(dp => dp.key === p)?.label || p).join(', ')}`
-                  : 'Sin privilegios'}
-              />
-              <ListItemSecondaryAction>
-                <IconButton color="primary" onClick={() => handleOpen(idx)}><EditIcon /></IconButton>
-                <IconButton color="error" onClick={() => handleDelete(idx)}><DeleteIcon /></IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
-          </Paper>
-        ))}
-      </List>
-      <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>{editIndex !== null ? 'Editar rol' : 'Agregar rol'}</DialogTitle>
-        <DialogContent>
+      <Button variant="contained" color="primary" onClick={() => handleOpen()} sx={{ mb: 2, width: { xs: '100%', sm: 'auto' }, fontWeight: 600 }}>Agregar rol</Button>
+      <Box sx={{ width: '100%' }}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr 1fr', sm: '1fr' },
+            gap: 2,
+          }}
+        >
+          {roles.map((role, idx) => (
+            <Paper key={role.name || role} sx={{ p: { xs: 1, sm: 2 }, borderRadius: 2 }}>
+              <ListItem sx={{ flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, gap: 1 }}>
+                <ListItemText
+                  primary={<Typography sx={{ fontWeight: 600, fontSize: { xs: 16, sm: 18 } }}>{role.name || role}</Typography>}
+                  secondary={role.privileges && role.privileges.length > 0
+                    ? `Privilegios: ${role.privileges.map(p => defaultPrivileges.find(dp => dp.key === p)?.label || p).join(', ')}`
+                    : 'Sin privilegios'}
+                />
+                <ListItemSecondaryAction sx={{ display: 'flex', gap: 1, position: 'static', mt: { xs: 1, sm: 0 } }}>
+                  <IconButton color="primary" onClick={() => handleOpen(idx)} size="small"><EditIcon /></IconButton>
+                  <IconButton color="error" onClick={() => handleDelete(idx)} size="small"><DeleteIcon /></IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+            </Paper>
+          ))}
+        </Box>
+      </Box>
+      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="xs">
+        <DialogTitle sx={{ fontWeight: 700, color: '#2d3a4a', background: '#e0e7ef' }}>{editIndex !== null ? 'Editar rol' : 'Agregar rol'}</DialogTitle>
+        <DialogContent sx={{ px: { xs: 1, sm: 3 }, py: { xs: 2, sm: 3 }, background: '#f8fafc' }}>
           <TextField
             label="Nombre del rol"
             value={roleName}
             onChange={e => setRoleName(e.target.value)}
             fullWidth
-            sx={{ mb: 2 }}
+            sx={{ mb: 2, background: '#fff', borderRadius: 2 }}
           />
           <Typography variant="subtitle1" sx={{ mb: 1 }}>Privilegios</Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
@@ -162,16 +177,16 @@ export default function RoleManager({ roles, setRoles }) {
                 variant={privileges.includes(priv.key) ? 'contained' : 'outlined'}
                 color={privileges.includes(priv.key) ? 'primary' : 'inherit'}
                 onClick={() => handleTogglePrivilege(priv.key)}
-                sx={{ textAlign: 'left', justifyContent: 'flex-start' }}
+                sx={{ textAlign: 'left', justifyContent: 'flex-start', fontSize: { xs: 13, sm: 15 }, borderRadius: 2 }}
               >
                 {priv.label}
               </Button>
             ))}
           </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancelar</Button>
-          <Button onClick={handleSave} variant="contained" color="primary">Guardar</Button>
+        <DialogActions sx={{ background: '#e0e7ef' }}>
+          <Button onClick={() => setOpen(false)} sx={{ color: '#2d3a4a', fontWeight: 600 }}>Cancelar</Button>
+          <Button onClick={handleSave} variant="contained" color="primary" sx={{ fontWeight: 600 }}>Guardar</Button>
         </DialogActions>
       </Dialog>
     </Box>

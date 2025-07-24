@@ -19,142 +19,125 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function CategoryManager({ categories, setCategories }) {
+  // Estado para el diálogo de edición/agregado
   const [open, setOpen] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
-  const [editCat, setEditCat] = useState('');
-  const [editSubs, setEditSubs] = useState([]);
-  const [newCat, setNewCat] = useState('');
-  const [newSub, setNewSub] = useState('');
-  const [subEditIndex, setSubEditIndex] = useState(null);
-  const [subEditValue, setSubEditValue] = useState('');
+  const [catName, setCatName] = useState('');
+  const [subcategories, setSubcategories] = useState([]);
 
-  // Abrir modal para agregar categoría
+  // Abrir diálogo para agregar o editar
   const handleOpen = (idx = null) => {
+    setEditIndex(idx);
     if (idx !== null) {
-      setEditIndex(idx);
-      setEditCat(categories[idx].name);
-      setEditSubs([...categories[idx].subcategories]);
+      setCatName(categories[idx].name || '');
+      setSubcategories(categories[idx].subcategories || []);
     } else {
-      setEditIndex(null);
-      setEditCat('');
-      setEditSubs([]);
+      setCatName('');
+      setSubcategories([]);
     }
     setOpen(true);
   };
 
-  // Guardar categoría
+  // Guardar cambios
   const handleSave = () => {
-    if (!editCat.trim()) return;
+    const newCategory = { name: catName, subcategories };
+    let updated;
     if (editIndex !== null) {
-      setCategories(prev => prev.map((cat, i) => i === editIndex ? { name: editCat.trim(), subcategories: editSubs } : cat));
+      updated = categories.map((cat, i) => i === editIndex ? newCategory : cat);
     } else {
-      setCategories(prev => [...prev, { name: editCat.trim(), subcategories: editSubs }]);
+      updated = [...categories, newCategory];
     }
+    setCategories(updated);
     setOpen(false);
-    setEditCat('');
-    setEditSubs([]);
+    setEditIndex(null);
+    setCatName('');
+    setSubcategories([]);
   };
 
   // Eliminar categoría
   const handleDelete = idx => {
-    setCategories(prev => prev.filter((_, i) => i !== idx));
+    setCategories(categories.filter((_, i) => i !== idx));
   };
 
-  // Agregar subcategoría
-  const handleAddSub = () => {
-    if (newSub.trim() && !editSubs.includes(newSub.trim())) {
-      setEditSubs(prev => [...prev, newSub.trim()]);
-      setNewSub('');
-    }
+  // Subcategorías
+  const handleAddSubcategory = () => {
+    setSubcategories([...subcategories, '']);
+  };
+  const handleSubcategoryChange = (i, value) => {
+    setSubcategories(subcategories.map((sub, idx) => idx === i ? value : sub));
+  };
+  const handleRemoveSubcategory = i => {
+    setSubcategories(subcategories.filter((_, idx) => idx !== i));
   };
 
-  // Editar subcategoría
-  const handleEditSub = idx => {
-    setSubEditIndex(idx);
-    setSubEditValue(editSubs[idx]);
-  };
-
-  const handleSaveSubEdit = () => {
-    if (subEditValue.trim()) {
-      setEditSubs(prev => prev.map((s, i) => i === subEditIndex ? subEditValue.trim() : s));
-      setSubEditIndex(null);
-      setSubEditValue('');
-    }
-  };
-
-  const handleDeleteSub = idx => {
-    setEditSubs(prev => prev.filter((_, i) => i !== idx));
-  };
-
+  // ...existing code...
   return (
-    <Box sx={{ width: '100%', maxWidth: 500, mx: 'auto', mt: 4 }}>
-      <Typography variant="h5" sx={{ mb: 2, fontWeight: 700, textAlign: 'center', color: '#2d3a4a' }}>Gestión de Categorías y Subcategorías</Typography>
-      {/* El precio se gestiona solo en dólares (USD) */}
-      <Button variant="contained" color="primary" onClick={() => handleOpen()} sx={{ mb: 2 }}>Agregar categoría</Button>
-      <List>
-        {categories.map((cat, idx) => (
-          <Paper key={cat.name} sx={{ mb: 2, p: 2 }}>
-            <ListItem>
-              <ListItemText
-                primary={cat.name}
-                secondary={cat.subcategories.length > 0 ? `Subcategorías: ${cat.subcategories.join(', ')}` : 'Sin subcategorías'}
-              />
-              <ListItemSecondaryAction>
-                <IconButton color="primary" onClick={() => handleOpen(idx)}><EditIcon /></IconButton>
-                <IconButton color="error" onClick={() => handleDelete(idx)}><DeleteIcon /></IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
-          </Paper>
-        ))}
-      </List>
-      <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>{editIndex !== null ? 'Editar categoría' : 'Agregar categoría'}</DialogTitle>
-        <DialogContent>
+    <Box sx={{
+      width: '100%',
+      maxWidth: { xs: '100%', sm: 500 },
+      mx: 'auto',
+      mt: { xs: 2, sm: 4 },
+      px: { xs: 1, sm: 2 },
+      boxSizing: 'border-box',
+    }}>
+      <Typography variant="h5" sx={{ mb: 2, fontWeight: 700, textAlign: 'center', color: '#2d3a4a' }}>Gestión de Categorías</Typography>
+      <Button variant="contained" color="primary" onClick={() => handleOpen()} sx={{ mb: 2, width: { xs: '100%', sm: 'auto' }, fontWeight: 600 }}>Agregar categoría</Button>
+      <Box sx={{ width: '100%' }}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr 1fr', sm: '1fr' },
+            gap: 2,
+          }}
+        >
+          {categories.map((cat, idx) => (
+            <Paper key={cat.name || cat} sx={{ p: { xs: 1, sm: 2 }, borderRadius: 2 }}>
+              <ListItem sx={{ flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, gap: 1 }}>
+                <ListItemText
+                  primary={<Typography sx={{ fontWeight: 600, fontSize: { xs: 16, sm: 18 } }}>{cat.name || cat}</Typography>}
+                  secondary={cat.subcategories && cat.subcategories.length > 0
+                    ? `Subcategorías: ${cat.subcategories.join(', ')}`
+                    : 'Sin subcategorías'}
+                />
+                <ListItemSecondaryAction sx={{ display: 'flex', gap: 1, position: 'static', mt: { xs: 1, sm: 0 } }}>
+                  <IconButton color="primary" onClick={() => handleOpen(idx)} size="small"><EditIcon /></IconButton>
+                  <IconButton color="error" onClick={() => handleDelete(idx)} size="small"><DeleteIcon /></IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+            </Paper>
+          ))}
+        </Box>
+      </Box>
+      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="xs">
+        <DialogTitle sx={{ fontWeight: 700, color: '#2d3a4a', background: '#e0e7ef' }}>{editIndex !== null ? 'Editar categoría' : 'Agregar categoría'}</DialogTitle>
+        <DialogContent sx={{ px: { xs: 1, sm: 3 }, py: { xs: 2, sm: 3 }, background: '#f8fafc' }}>
           <TextField
             label="Nombre de la categoría"
-            value={editCat}
-            onChange={e => setEditCat(e.target.value)}
+            value={catName}
+            onChange={e => setCatName(e.target.value)}
             fullWidth
-            sx={{ mb: 2 }}
+            sx={{ mb: 2, background: '#fff', borderRadius: 2 }}
           />
           <Typography variant="subtitle1" sx={{ mb: 1 }}>Subcategorías</Typography>
-          <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-            <TextField
-              label="Nueva subcategoría"
-              value={newSub}
-              onChange={e => setNewSub(e.target.value)}
-              sx={{ flex: 1 }}
-            />
-            <Button variant="outlined" onClick={handleAddSub}>Agregar</Button>
-          </Box>
-          <List>
-            {editSubs.map((sub, idx) => (
-              <ListItem key={sub}>
-                {subEditIndex === idx ? (
-                  <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
-                    <TextField value={subEditValue} onChange={e => setSubEditValue(e.target.value)} sx={{ flex: 1 }} />
-                    <Button variant="contained" size="small" onClick={handleSaveSubEdit}>Guardar</Button>
-                    <Button variant="outlined" size="small" color="error" onClick={() => { setSubEditIndex(null); setSubEditValue(''); }}>Cancelar</Button>
-                  </Box>
-                ) : (
-                  <>
-                    <ListItemText primary={sub} />
-                    <ListItemSecondaryAction>
-                      <IconButton color="primary" onClick={() => handleEditSub(idx)}><EditIcon /></IconButton>
-                      <IconButton color="error" onClick={() => handleDeleteSub(idx)}><DeleteIcon /></IconButton>
-                    </ListItemSecondaryAction>
-                  </>
-                )}
-              </ListItem>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
+            {subcategories.map((subcat, i) => (
+              <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <TextField
+                  value={subcat}
+                  onChange={e => handleSubcategoryChange(i, e.target.value)}
+                  size="small"
+                  sx={{ flex: 1, background: '#fff', borderRadius: 2 }}
+                />
+                <IconButton color="error" onClick={() => handleRemoveSubcategory(i)} size="small"><DeleteIcon /></IconButton>
+              </Box>
             ))}
-          </List>
+            <Button variant="outlined" onClick={handleAddSubcategory} sx={{ mt: 1, fontWeight: 600 }}>Agregar subcategoría</Button>
+          </Box>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancelar</Button>
-          <Button onClick={handleSave} variant="contained" color="primary">Guardar</Button>
+        <DialogActions sx={{ background: '#e0e7ef' }}>
+          <Button onClick={() => setOpen(false)} sx={{ color: '#2d3a4a', fontWeight: 600 }}>Cancelar</Button>
+          <Button onClick={handleSave} variant="contained" color="primary" sx={{ fontWeight: 600 }}>Guardar</Button>
         </DialogActions>
       </Dialog>
     </Box>
-  );
-}
-// ...existing code...
+  );}
