@@ -209,11 +209,32 @@ export default function Orders({ menuByDay, selectedDay }) {
   return (
     <Box sx={{ width: '100%', minHeight: 'calc(100vh - 64px)', background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%)', fontFamily: 'Montserrat, Arial, sans-serif', p: { xs: 2, sm: 3, md: 4 } }}>
       <Typography variant="h4" sx={{ mb: 4, fontWeight: 700, textAlign: 'center', color: '#2d3a4a', letterSpacing: 1 }}>Gestión de Pedidos</Typography>
-      <Box sx={{ display: 'flex', gap: 4, flexDirection: { xs: 'column', md: 'row' }, alignItems: 'flex-start', justifyContent: 'center' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: { xs: 2, sm: 3, md: 4 },
+          flexDirection: { xs: 'column', md: 'row' },
+          alignItems: { xs: 'stretch', md: 'flex-start' },
+          justifyContent: 'center',
+          width: '100%',
+          maxWidth: { xs: '100%', md: 1200 },
+          mx: 'auto',
+        }}
+      >
         {/* Columna 1: Mesas */}
-        <Box sx={{ flex: 1, minWidth: 220 }}>
+        <Box sx={{ flex: 1, minWidth: { xs: '100%', sm: 220 }, maxWidth: { xs: '100%', md: 340 }, mb: { xs: 2, md: 0 } }}>
           <Typography variant="h6" sx={{ mb: 2, color: '#1976d2', fontWeight: 700 }}>Mesas</Typography>
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', sm: '1fr 1fr' }, gap: 2 }}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr 1fr',
+                sm: '1fr 1fr',
+                md: '1fr',
+              },
+              gap: { xs: 1, sm: 2 },
+            }}
+          >
             {mesas.map(mesa => {
               const pedido = orders.find(o => o.mesa === mesa);
               const isSelected = mesaSeleccionada === mesa;
@@ -248,9 +269,24 @@ export default function Orders({ menuByDay, selectedDay }) {
           </Box>
         </Box>
         {/* Columna 2: Menú del día */}
-        <Box sx={{ flex: 2, minWidth: 320 }}>
+        <Box sx={{
+          flex: 2,
+          minWidth: { xs: '100%', sm: 320 },
+          maxWidth: { xs: '100%', md: 800 },
+          width: '100%',
+        }}>
           <Typography variant="h6" sx={{ mb: 2, color: '#1976d2', fontWeight: 700 }}>Menú del día ({selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)})</Typography>
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' }, gap: 2 }}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr 1fr', // dos columnas en móvil
+                sm: '1fr 1fr', // dos columnas en tablet
+                md: '1fr 1fr 1fr', // tres columnas en desktop
+              },
+              gap: { xs: 1, sm: 2 },
+            }}
+          >
             {menuByDay[selectedDay].length === 0 ? (
               <Typography variant="body2" sx={{ color: '#bdbdbd', fontStyle: 'italic', gridColumn: '1/-1' }}>No hay platillos para este día.</Typography>
             ) : (
@@ -271,7 +307,19 @@ export default function Orders({ menuByDay, selectedDay }) {
           </Box>
           {/* Mostrar pedido actual de la mesa seleccionada */}
           {mesaSeleccionada && pedidoMesa && (
-            <Box sx={{ mt: 4, p: 2, background: '#fffbe6', borderRadius: 3, boxShadow: '0 2px 8px #ffe082', border: '1px solid #fbc02d' }}>
+            <Box
+              sx={{
+                mt: 4,
+                p: { xs: 1, sm: 2 },
+                background: '#fffbe6',
+                borderRadius: 3,
+                boxShadow: '0 2px 8px #ffe082',
+                border: '1px solid #fbc02d',
+                width: '100%',
+                maxWidth: 420,
+                mx: { xs: 'auto', md: 0 },
+              }}
+            >
               <Typography variant="h6" sx={{ color: '#fbc02d', fontWeight: 700, mb: 1 }}>Pedido de Mesa {mesaSeleccionada}</Typography>
     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
       <Typography variant="body2" sx={{ color: '#607d8b', mr: 1 }}>Cliente:</Typography>
@@ -284,19 +332,33 @@ export default function Orders({ menuByDay, selectedDay }) {
         sx={{ background: '#fff', borderRadius: 2, minWidth: 140 }}
       />
     </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2, width: '100%' }}>
                 {Array.isArray(pedidoMesa.platillos) ? pedidoMesa.platillos.map((p, idx) => {
                   const platillo = menuByDay[selectedDay]?.find(m => m.name === p.name);
                   return (
-                    <Paper key={idx} sx={{ display: 'flex', alignItems: 'center', p: 1, borderRadius: 2, background: '#fff', boxShadow: '0 1px 4px #ffe082', mb: 0.5 }}>
-                      <Typography sx={{ minWidth: 90, fontWeight: 600 }}>{p.name}</Typography>
-                      <Button size="small" onClick={() => handleCambiarCantidad(p.name, p.cantidad - 1)} sx={{ minWidth: 32, fontWeight: 700 }}>-</Button>
-                      <Typography sx={{ mx: 1, minWidth: 24, textAlign: 'center', fontWeight: 600 }}>{p.cantidad}</Typography>
-                      <Button size="small" onClick={() => handleCambiarCantidad(p.name, p.cantidad + 1)} sx={{ minWidth: 32, fontWeight: 700 }}>+</Button>
-                      <Typography sx={{ ml: 2, minWidth: 60, color: '#388e3c', fontWeight: 600 }}>
+                    <Paper
+                      key={idx}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        p: { xs: 0.5, sm: 1 },
+                        borderRadius: 2,
+                        background: '#fff',
+                        boxShadow: '0 1px 4px #ffe082',
+                        mb: 0.5,
+                        flexWrap: { xs: 'wrap', sm: 'nowrap' },
+                        width: '100%',
+                        minWidth: 0,
+                      }}
+                    >
+                      <Typography sx={{ minWidth: 70, fontWeight: 600, fontSize: { xs: 13, sm: 15 } }}>{p.name}</Typography>
+                      <Button size="small" onClick={() => handleCambiarCantidad(p.name, p.cantidad - 1)} sx={{ minWidth: 28, fontWeight: 700, px: 0 }}>-</Button>
+                      <Typography sx={{ mx: 1, minWidth: 20, textAlign: 'center', fontWeight: 600, fontSize: { xs: 13, sm: 15 } }}>{p.cantidad}</Typography>
+                      <Button size="small" onClick={() => handleCambiarCantidad(p.name, p.cantidad + 1)} sx={{ minWidth: 28, fontWeight: 700, px: 0 }}>+</Button>
+                      <Typography sx={{ ml: 2, minWidth: 48, color: '#388e3c', fontWeight: 600, fontSize: { xs: 13, sm: 15 } }}>
                         ${platillo ? (platillo.price * p.cantidad).toFixed(2) : '0.00'}
                       </Typography>
-                      <Button size="small" color="error" onClick={() => handleEliminarPlatillo(p.name)} sx={{ ml: 1, minWidth: 32 }}>x</Button>
+                      <Button size="small" color="error" onClick={() => handleEliminarPlatillo(p.name)} sx={{ ml: 1, minWidth: 28, px: 0 }}>x</Button>
                     </Paper>
                   );
                 }) : null}
