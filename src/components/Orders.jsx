@@ -121,6 +121,15 @@ export default function Orders({ menuByDay, selectedDay }) {
   // Helper para obtener el pedido de la mesa seleccionada
   const pedidoMesa = mesaSeleccionada ? orders.find(o => o.mesa === mesaSeleccionada) : null;
 
+  // Calcular total del pedido de la mesa seleccionada
+  let totalPedido = 0;
+  if (pedidoMesa && Array.isArray(pedidoMesa.platillos)) {
+    totalPedido = pedidoMesa.platillos.reduce((acc, nombrePlatillo) => {
+      const platillo = menuByDay[selectedDay]?.find(p => p.name === nombrePlatillo);
+      return platillo ? acc + Number(platillo.price || 0) : acc;
+    }, 0);
+  }
+
   // Handler para agregar platillo desde menú visual
   const handleAgregarPlatillo = (platillo) => {
     if (!mesaSeleccionada) return;
@@ -199,6 +208,10 @@ export default function Orders({ menuByDay, selectedDay }) {
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
                 {Array.isArray(pedidoMesa.platillos) ? pedidoMesa.platillos.map((p, idx) => <Chip key={idx} label={p} size="small" />) : null}
               </Box>
+              {/* Mostrar total del pedido */}
+              <Typography variant="h6" sx={{ color: '#388e3c', fontWeight: 700, mb: 2, textAlign: 'right' }}>
+                Total: ${totalPedido.toFixed(2)}
+              </Typography>
               <TextField label="Notas (opcional)" value={pedidoMesa.notas || ''} onChange={e => setOrders(orders.map(o => o.mesa === mesaSeleccionada ? { ...o, notas: e.target.value } : o))} multiline minRows={2} maxRows={4} sx={{ mb: 2, background: '#fff', borderRadius: 2 }} />
               <Button onClick={() => { setOrders(orders.filter(o => o.mesa !== mesaSeleccionada)); setSnackbar({ open: true, message: 'Pedido eliminado' }); }} color="error" sx={{ fontWeight: 600 }}>
                 <CancelIcon sx={{ mr: 1 }} /> Eliminar pedido
