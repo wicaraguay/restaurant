@@ -17,6 +17,15 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Cancel';
+import GroupIcon from '@mui/icons-material/Group';
+import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
+import TableRestaurantIcon from '@mui/icons-material/TableRestaurant';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 
 const defaultPrivileges = [
   { key: 'crud_empleados', label: 'Gestionar empleados' },
@@ -132,7 +141,12 @@ export default function RoleManager({ roles, setRoles }) {
       boxSizing: 'border-box',
     }}>
       <Typography variant="h5" sx={{ mb: 2, fontWeight: 700, textAlign: 'center', color: '#2d3a4a' }}>Gestión de Roles y Privilegios</Typography>
-      <Button variant="contained" color="primary" onClick={() => handleOpen()} sx={{ mb: 2, width: { xs: '100%', sm: 'auto' }, fontWeight: 600 }}>Agregar rol</Button>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+        <Button variant="contained" color="primary" onClick={() => handleOpen()} sx={{ fontWeight: 600, borderRadius: 2, px: 3 }}>
+          <AddIcon sx={{ mr: 1 }} />
+          Agregar rol
+        </Button>
+      </Box>
       <Box sx={{ width: '100%' }}>
         <Box
           sx={{
@@ -191,22 +205,41 @@ export default function RoleManager({ roles, setRoles }) {
           />
           <Typography variant="subtitle1" sx={{ mb: 1 }}>Privilegios</Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
-            {defaultPrivileges.map(priv => (
-              <Button
-                key={priv.key}
-                variant={privileges.includes(priv.key) ? 'contained' : 'outlined'}
-                color={privileges.includes(priv.key) ? 'primary' : 'inherit'}
-                onClick={() => handleTogglePrivilege(priv.key)}
-                sx={{ textAlign: 'left', justifyContent: 'flex-start', fontSize: { xs: 13, sm: 15 }, borderRadius: 2 }}
-              >
-                {priv.label}
-              </Button>
-            ))}
+            {defaultPrivileges.map(priv => {
+              let icon = null;
+              switch (priv.key) {
+                case 'crud_empleados': icon = <GroupIcon sx={{ mr: 1 }} />; break;
+                case 'crud_menu': icon = <RestaurantMenuIcon sx={{ mr: 1 }} />; break;
+                case 'crud_mesas': icon = <TableRestaurantIcon sx={{ mr: 1 }} />; break;
+                case 'ver_reportes': icon = <AssessmentIcon sx={{ mr: 1 }} />; break;
+                case 'ver_pedidos': icon = <ReceiptLongIcon sx={{ mr: 1 }} />; break;
+                case 'admin': icon = <AdminPanelSettingsIcon sx={{ mr: 1 }} />; break;
+                default: break;
+              }
+              return (
+                <Button
+                  key={priv.key}
+                  variant={privileges.includes(priv.key) ? 'contained' : 'outlined'}
+                  color={privileges.includes(priv.key) ? 'primary' : 'inherit'}
+                  onClick={() => handleTogglePrivilege(priv.key)}
+                  sx={{ textAlign: 'left', justifyContent: 'flex-start', fontSize: { xs: 13, sm: 15 }, borderRadius: 2 }}
+                >
+                  {icon}
+                  {priv.label}
+                </Button>
+              );
+            })}
           </Box>
         </DialogContent>
         <DialogActions sx={{ background: '#e0e7ef' }}>
-          <Button onClick={() => setOpen(false)} sx={{ color: '#2d3a4a', fontWeight: 600 }}>Cancelar</Button>
-          <Button onClick={handleSave} variant="contained" color="primary" sx={{ fontWeight: 600 }}>Guardar</Button>
+          <Button onClick={() => setOpen(false)} sx={{ color: '#2d3a4a', fontWeight: 600 }}>
+            <CancelIcon sx={{ mr: 1 }} />
+            Cancelar
+          </Button>
+          <Button onClick={handleSave} variant="contained" color="primary" sx={{ fontWeight: 600 }}>
+            <SaveIcon sx={{ mr: 1 }} />
+            Guardar
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

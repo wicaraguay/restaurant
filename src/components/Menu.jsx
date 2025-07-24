@@ -22,6 +22,11 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 const initialMenu = [
   {
@@ -292,12 +297,15 @@ export default function Menu({ categories, setCategories }) {
           </Select>
         </FormControl>
         <Button variant="contained" color="primary" onClick={() => handleOpen()} sx={{ fontWeight: 600, borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.10)', px: 3 }}>
+          <AddIcon sx={{ mr: 1 }} />
           Agregar platillo
         </Button>
         <Button variant="outlined" color="secondary" onClick={handleExportPDF} sx={{ fontWeight: 600, borderRadius: 2, px: 2 }}>
+          <PictureAsPdfIcon sx={{ mr: 1 }} />
           Exportar PDF
         </Button>
         <Button variant="outlined" color="success" onClick={handleExportCSV} sx={{ fontWeight: 600, borderRadius: 2, px: 2 }}>
+          <FileDownloadIcon sx={{ mr: 1 }} />
           Exportar Excel
         </Button>
       </Box>
@@ -553,8 +561,12 @@ export default function Menu({ categories, setCategories }) {
           </Box>
         </DialogContent>
         <DialogActions sx={{ background: '#e0e7ef', borderTop: '1px solid #cfd8dc' }}>
-          <Button onClick={() => setOpen(false)} sx={{ color: '#2d3a4a', fontWeight: 600 }}>Cancelar</Button>
+          <Button onClick={() => setOpen(false)} sx={{ color: '#2d3a4a', fontWeight: 600 }}>
+            <CancelIcon sx={{ mr: 1 }} />
+            Cancelar
+          </Button>
           <Button onClick={handleSave} variant="contained" color="primary" sx={{ fontWeight: 600 }}>
+            <SaveIcon sx={{ mr: 1 }} />
             Guardar
           </Button>
         </DialogActions>

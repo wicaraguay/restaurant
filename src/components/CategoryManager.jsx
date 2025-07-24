@@ -1,3 +1,6 @@
+import AddIcon from '@mui/icons-material/Add';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Cancel';
 import React, { useState } from 'react';
 import {
   Box,
@@ -81,7 +84,11 @@ export default function CategoryManager({ categories, setCategories }) {
       boxSizing: 'border-box',
     }}>
       <Typography variant="h5" sx={{ mb: 2, fontWeight: 700, textAlign: 'center', color: '#2d3a4a' }}>Gestión de Categorías</Typography>
-      <Button variant="contained" color="primary" onClick={() => handleOpen()} sx={{ mb: 2, width: { xs: '100%', sm: 'auto' }, fontWeight: 600 }}>Agregar categoría</Button>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+        <Button variant="contained" color="primary" onClick={() => handleOpen()} startIcon={<AddIcon />} sx={{ fontWeight: 600, borderRadius: 2, px: 3 }}>
+          Agregar categoría
+        </Button>
+      </Box>
       <Box sx={{ width: '100%' }}>
         <Box
           sx={{
@@ -155,8 +162,12 @@ export default function CategoryManager({ categories, setCategories }) {
           </Box>
         </DialogContent>
         <DialogActions sx={{ background: '#e0e7ef' }}>
-          <Button onClick={() => setOpen(false)} sx={{ color: '#2d3a4a', fontWeight: 600 }}>Cancelar</Button>
-          <Button onClick={handleSave} variant="contained" color="primary" sx={{ fontWeight: 600 }}>Guardar</Button>
+          <Button onClick={() => setOpen(false)} startIcon={<CancelIcon />} sx={{ color: '#2d3a4a', fontWeight: 600 }}>
+            Cancelar
+          </Button>
+          <Button onClick={handleSave} variant="contained" color="primary" startIcon={<SaveIcon />} sx={{ fontWeight: 600 }}>
+            Guardar
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

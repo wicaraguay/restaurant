@@ -28,6 +28,9 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
 import PeopleIcon from '@mui/icons-material/People';
 import BarChartIcon from '@mui/icons-material/BarChart';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import CategoryIcon from '@mui/icons-material/Category';
+import GroupIcon from '@mui/icons-material/Group';
 import CssBaseline from '@mui/material/CssBaseline';
 
 
@@ -52,9 +55,9 @@ function App() {
     { name: 'Mesas', icon: <TableRestaurantIcon />, component: <Tables /> },
     { name: 'Pedidos', icon: <ReceiptLongIcon />, component: <Orders /> },
     { name: 'Menú', icon: <RestaurantMenuIcon />, component: <Menu categories={categories} setCategories={setCategories} currency={currency} /> },
-    { name: 'Categorías', icon: <RestaurantMenuIcon />, component: <CategoryManager categories={categories} setCategories={setCategories} currency={currency} setCurrency={setCurrency} standalone /> },
-    { name: 'Roles', icon: <PeopleIcon />, component: <RoleManager roles={roles} setRoles={setRoles} /> },
-    { name: 'Empleados', icon: <PeopleIcon />, component: <Employees roles={roles} setRoles={setRoles} /> },
+    { name: 'Categorías', icon: <CategoryIcon />, component: <CategoryManager categories={categories} setCategories={setCategories} currency={currency} setCurrency={setCurrency} standalone /> },
+    { name: 'Roles', icon: <AssignmentIndIcon />, component: <RoleManager roles={roles} setRoles={setRoles} /> },
+    { name: 'Empleados', icon: <GroupIcon />, component: <Employees roles={roles} setRoles={setRoles} /> },
     { name: 'Reportes', icon: <BarChartIcon />, component: <Reports /> },
   ];
 

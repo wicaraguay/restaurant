@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import EditIcon from '@mui/icons-material/Edit';
 import HistoryIcon from '@mui/icons-material/History';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Cancel';
 import {
   Box,
   Typography,
@@ -233,6 +236,7 @@ function Employees({ roles, setRoles }) {
             sx={{ minWidth: 220, background: '#fff', borderRadius: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
           />
           <Button variant="contained" color="primary" onClick={() => handleOpen()} sx={{ fontWeight: 600, borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.10)', px: 3 }}>
+            <AddIcon sx={{ mr: 1 }} />
             Agregar empleado
           </Button>
         </Box>
@@ -451,8 +455,12 @@ function Employees({ roles, setRoles }) {
             </Box>
           </DialogContent>
           <DialogActions sx={{ background: '#e0e7ef', borderTop: '1px solid #cfd8dc' }}>
-            <Button onClick={() => setOpen(false)} sx={{ color: '#2d3a4a', fontWeight: 600 }}>Cancelar</Button>
+            <Button onClick={() => setOpen(false)} sx={{ color: '#2d3a4a', fontWeight: 600 }}>
+              <CancelIcon sx={{ mr: 1 }} />
+              Cancelar
+            </Button>
             <Button onClick={handleSave} variant="contained" color="primary" sx={{ fontWeight: 600 }}>
+              <SaveIcon sx={{ mr: 1 }} />
               Guardar
             </Button>
           </DialogActions>
