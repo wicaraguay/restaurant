@@ -121,16 +121,19 @@ export default function Orders({ menuByDay, selectedDay }) {
   // Helper para obtener el pedido de la mesa seleccionada
   const pedidoMesa = mesaSeleccionada ? orders.find(o => o.mesa === mesaSeleccionada) : null;
 
-  // Calcular total del pedido de la mesa seleccionada
-  let totalPedido = 0;
-  if (pedidoMesa && Array.isArray(pedidoMesa.platillos)) {
-    totalPedido = pedidoMesa.platillos.reduce((acc, nombrePlatillo) => {
-      const platillo = menuByDay[selectedDay]?.find(p => p.name === nombrePlatillo);
-      return platillo ? acc + Number(platillo.price || 0) : acc;
-    }, 0);
-  }
+  // Cambia la estructura de platillos a [{ name, cantidad }]
+  React.useEffect(() => {
+    if (!pedidoMesa || !Array.isArray(pedidoMesa.platillos)) return;
+    if (pedidoMesa.platillos.length > 0 && typeof pedidoMesa.platillos[0] === 'string') {
+      setOrders(orders.map(o =>
+        o.mesa === mesaSeleccionada
+          ? { ...o, platillos: o.platillos.map(p => ({ name: p, cantidad: 1 })) }
+          : o
+      ));
+    }
+  }, [mesaSeleccionada]);
 
-  // Handler para agregar platillo desde menú visual
+  // Handler para agregar platillo desde menú visual (con cantidad)
   const handleAgregarPlatillo = (platillo) => {
     if (!mesaSeleccionada) return;
     if (!pedidoMesa) {
@@ -141,18 +144,67 @@ export default function Orders({ menuByDay, selectedDay }) {
           id: crypto.randomUUID(),
           mesa: mesaSeleccionada,
           cliente: '',
-          platillos: [platillo.name],
+          platillos: [{ name: platillo.name, cantidad: 1 }],
           estado: 'pendiente',
           notas: '',
           fecha: new Date().toISOString().slice(0, 16)
         }
       ]);
       setSnackbar({ open: true, message: 'Pedido creado y platillo agregado' });
-    } else if (!pedidoMesa.platillos.includes(platillo.name)) {
-      setOrders(orders.map(o => o.mesa === mesaSeleccionada ? { ...o, platillos: [...o.platillos, platillo.name] } : o));
-      setSnackbar({ open: true, message: 'Platillo agregado' });
+    } else {
+      // Buscar si ya existe el platillo
+      const idx = pedidoMesa.platillos.findIndex(p => p.name === platillo.name);
+      if (idx === -1) {
+        setOrders(orders.map(o =>
+          o.mesa === mesaSeleccionada
+            ? { ...o, platillos: [...o.platillos, { name: platillo.name, cantidad: 1 }] }
+            : o
+        ));
+        setSnackbar({ open: true, message: 'Platillo agregado' });
+      } else {
+        setOrders(orders.map(o =>
+          o.mesa === mesaSeleccionada
+            ? { ...o, platillos: o.platillos.map((p, i) => i === idx ? { ...p, cantidad: p.cantidad + 1 } : p) }
+            : o
+        ));
+        setSnackbar({ open: true, message: 'Cantidad aumentada' });
+      }
     }
   };
+
+  // Eliminar platillo del pedido de la mesa seleccionada
+  const handleEliminarPlatillo = (nombrePlatillo) => {
+    if (!mesaSeleccionada || !pedidoMesa) return;
+    setOrders(orders.map(o =>
+      o.mesa === mesaSeleccionada
+        ? { ...o, platillos: o.platillos.filter(p => p.name !== nombrePlatillo) }
+        : o
+    ));
+    setSnackbar({ open: true, message: 'Platillo eliminado del pedido' });
+  };
+
+  // Cambiar cantidad de un platillo
+  const handleCambiarCantidad = (nombrePlatillo, nuevaCantidad) => {
+    if (!mesaSeleccionada || !pedidoMesa) return;
+    if (nuevaCantidad < 1) {
+      handleEliminarPlatillo(nombrePlatillo);
+      return;
+    }
+    setOrders(orders.map(o =>
+      o.mesa === mesaSeleccionada
+        ? { ...o, platillos: o.platillos.map(p => p.name === nombrePlatillo ? { ...p, cantidad: nuevaCantidad } : p) }
+        : o
+    ));
+  };
+
+  // Calcular total del pedido de la mesa seleccionada
+  let totalPedido = 0;
+  if (pedidoMesa && Array.isArray(pedidoMesa.platillos)) {
+    totalPedido = pedidoMesa.platillos.reduce((acc, p) => {
+      const platillo = menuByDay[selectedDay]?.find(m => m.name === p.name);
+      return platillo ? acc + Number(platillo.price || 0) * (p.cantidad || 1) : acc;
+    }, 0);
+  }
 
   return (
     <Box sx={{ width: '100%', minHeight: 'calc(100vh - 64px)', background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%)', fontFamily: 'Montserrat, Arial, sans-serif', p: { xs: 2, sm: 3, md: 4 } }}>
@@ -164,8 +216,25 @@ export default function Orders({ menuByDay, selectedDay }) {
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', sm: '1fr 1fr' }, gap: 2 }}>
             {mesas.map(mesa => {
               const pedido = orders.find(o => o.mesa === mesa);
+              const isSelected = mesaSeleccionada === mesa;
               return (
-                <Paper key={mesa} elevation={3} sx={{ p: 2, borderRadius: 3, background: mesaSeleccionada === mesa ? '#fffbe6' : '#fff', boxShadow: mesaSeleccionada === mesa ? '0 4px 16px #ffe082' : '0 2px 12px rgba(0,0,0,0.08)', display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', border: mesaSeleccionada === mesa ? '2px solid #fbc02d' : '2px solid #e0e0e0', minHeight: 120 }} onClick={() => setMesaSeleccionada(mesa)}>
+                <Paper
+                  key={mesa}
+                  elevation={3}
+                  sx={{
+                    p: 2,
+                    borderRadius: 3,
+                    background: isSelected ? '#fffbe6' : '#fff',
+                    boxShadow: isSelected ? '0 4px 16px #ffe082' : '0 2px 12px rgba(0,0,0,0.08)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    border: isSelected ? '2px solid #fbc02d' : '2px solid #e0e0e0',
+                    minHeight: 120
+                  }}
+                  onClick={() => setMesaSeleccionada(isSelected ? null : mesa)}
+                >
                   <TableRestaurantIcon sx={{ color: pedido ? '#fbc02d' : '#1976d2', fontSize: 36, mb: 1 }} />
                   <Typography variant="body1" sx={{ fontWeight: 700, color: '#2d3a4a' }}>Mesa {mesa}</Typography>
                   {pedido ? (
@@ -204,11 +273,34 @@ export default function Orders({ menuByDay, selectedDay }) {
           {mesaSeleccionada && pedidoMesa && (
             <Box sx={{ mt: 4, p: 2, background: '#fffbe6', borderRadius: 3, boxShadow: '0 2px 8px #ffe082', border: '1px solid #fbc02d' }}>
               <Typography variant="h6" sx={{ color: '#fbc02d', fontWeight: 700, mb: 1 }}>Pedido de Mesa {mesaSeleccionada}</Typography>
-              <Typography variant="body2" sx={{ color: '#607d8b', mb: 1 }}>Cliente: {pedidoMesa.cliente || 'Sin nombre'}</Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
-                {Array.isArray(pedidoMesa.platillos) ? pedidoMesa.platillos.map((p, idx) => <Chip key={idx} label={p} size="small" />) : null}
+    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+      <Typography variant="body2" sx={{ color: '#607d8b', mr: 1 }}>Cliente:</Typography>
+      <TextField
+        size="small"
+        variant="outlined"
+        value={pedidoMesa.cliente || ''}
+        onChange={e => setOrders(orders.map(o => o.mesa === mesaSeleccionada ? { ...o, cliente: e.target.value } : o))}
+        placeholder="Nombre del cliente"
+        sx={{ background: '#fff', borderRadius: 2, minWidth: 140 }}
+      />
+    </Box>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
+                {Array.isArray(pedidoMesa.platillos) ? pedidoMesa.platillos.map((p, idx) => {
+                  const platillo = menuByDay[selectedDay]?.find(m => m.name === p.name);
+                  return (
+                    <Paper key={idx} sx={{ display: 'flex', alignItems: 'center', p: 1, borderRadius: 2, background: '#fff', boxShadow: '0 1px 4px #ffe082', mb: 0.5 }}>
+                      <Typography sx={{ minWidth: 90, fontWeight: 600 }}>{p.name}</Typography>
+                      <Button size="small" onClick={() => handleCambiarCantidad(p.name, p.cantidad - 1)} sx={{ minWidth: 32, fontWeight: 700 }}>-</Button>
+                      <Typography sx={{ mx: 1, minWidth: 24, textAlign: 'center', fontWeight: 600 }}>{p.cantidad}</Typography>
+                      <Button size="small" onClick={() => handleCambiarCantidad(p.name, p.cantidad + 1)} sx={{ minWidth: 32, fontWeight: 700 }}>+</Button>
+                      <Typography sx={{ ml: 2, minWidth: 60, color: '#388e3c', fontWeight: 600 }}>
+                        ${platillo ? (platillo.price * p.cantidad).toFixed(2) : '0.00'}
+                      </Typography>
+                      <Button size="small" color="error" onClick={() => handleEliminarPlatillo(p.name)} sx={{ ml: 1, minWidth: 32 }}>x</Button>
+                    </Paper>
+                  );
+                }) : null}
               </Box>
-              {/* Mostrar total del pedido */}
               <Typography variant="h6" sx={{ color: '#388e3c', fontWeight: 700, mb: 2, textAlign: 'right' }}>
                 Total: ${totalPedido.toFixed(2)}
               </Typography>
