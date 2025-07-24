@@ -353,7 +353,7 @@ export default function Menu({ categories, setCategories }) {
             </Avatar>
             <Typography variant="h6" sx={{ fontWeight: 700, color: '#2d3a4a', mb: 1 }}>{item.name}</Typography>
             <Typography variant="body2" sx={{ color: '#607d8b', mb: 1 }}>{item.category}</Typography>
-            <Typography variant="body2" sx={{ color: '#607d8b', mb: 1 }}>S/. {item.price}</Typography>
+            <Typography variant="body2" sx={{ color: '#607d8b', mb: 1 }}>$ {item.price}</Typography>
             <Typography variant="body2" sx={{ color: '#607d8b', mb: 2, textAlign: 'center' }}>{item.description}</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <Switch
@@ -499,7 +499,7 @@ export default function Menu({ categories, setCategories }) {
             {errors.subcategory && <Typography color="error" variant="caption">{errors.subcategory}</Typography>}
           </FormControl>
           <TextField
-            label="Precio"
+            label="Precio (USD)"
             value={form.price}
             onChange={e => setForm({ ...form, price: e.target.value })}
             required

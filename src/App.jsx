@@ -43,13 +43,14 @@ function App() {
   const [selected, setSelected] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categories, setCategories] = useState(defaultCategories);
+  const [currency, setCurrency] = useState('PEN'); // Default: Soles
 
   const sections = [
     { name: 'Dashboard', icon: <DashboardIcon />, component: <Box sx={{p:2}}><Typography variant="h4" sx={{fontWeight:'bold',mb:2}}>Bienvenido al Panel de Gestión</Typography><Typography>Selecciona una sección en el menú lateral para comenzar.</Typography></Box> },
     { name: 'Mesas', icon: <TableRestaurantIcon />, component: <Tables /> },
     { name: 'Pedidos', icon: <ReceiptLongIcon />, component: <Orders /> },
-    { name: 'Menú', icon: <RestaurantMenuIcon />, component: <Menu categories={categories} setCategories={setCategories} /> },
-    { name: 'Categorías', icon: <RestaurantMenuIcon />, component: <CategoryManager categories={categories} setCategories={setCategories} standalone /> },
+    { name: 'Menú', icon: <RestaurantMenuIcon />, component: <Menu categories={categories} setCategories={setCategories} currency={currency} /> },
+    { name: 'Categorías', icon: <RestaurantMenuIcon />, component: <CategoryManager categories={categories} setCategories={setCategories} currency={currency} setCurrency={setCurrency} standalone /> },
     { name: 'Empleados', icon: <PeopleIcon />, component: <Employees /> },
     { name: 'Reportes', icon: <BarChartIcon />, component: <Reports /> },
   ];

@@ -89,6 +89,7 @@ export default function CategoryManager({ categories, setCategories }) {
   return (
     <Box sx={{ width: '100%', maxWidth: 500, mx: 'auto', mt: 4 }}>
       <Typography variant="h5" sx={{ mb: 2, fontWeight: 700, textAlign: 'center', color: '#2d3a4a' }}>Gestión de Categorías y Subcategorías</Typography>
+      {/* El precio se gestiona solo en dólares (USD) */}
       <Button variant="contained" color="primary" onClick={() => handleOpen()} sx={{ mb: 2 }}>Agregar categoría</Button>
       <List>
         {categories.map((cat, idx) => (
@@ -156,3 +157,4 @@ export default function CategoryManager({ categories, setCategories }) {
     </Box>
   );
 }
+// ...existing code...
