@@ -5,6 +5,7 @@ import Tables from './components/Tables.jsx';
 import Orders from './components/Orders.jsx';
 import Menu from './components/Menu.jsx';
 import Employees from './components/Employees.jsx';
+import RoleManager from './components/RoleManager.jsx';
 import Reports from './components/Reports.jsx';
 import CategoryManager from './components/CategoryManager.jsx';
 import AppBar from '@mui/material/AppBar';
@@ -44,6 +45,7 @@ function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categories, setCategories] = useState(defaultCategories);
   const [currency, setCurrency] = useState('PEN'); // Default: Soles
+  const [roles, setRoles] = useState(['Mesero', 'Cocinero', 'Administrador', 'Cajero']);
 
   const sections = [
     { name: 'Dashboard', icon: <DashboardIcon />, component: <Box sx={{p:2}}><Typography variant="h4" sx={{fontWeight:'bold',mb:2}}>Bienvenido al Panel de Gestión</Typography><Typography>Selecciona una sección en el menú lateral para comenzar.</Typography></Box> },
@@ -51,7 +53,8 @@ function App() {
     { name: 'Pedidos', icon: <ReceiptLongIcon />, component: <Orders /> },
     { name: 'Menú', icon: <RestaurantMenuIcon />, component: <Menu categories={categories} setCategories={setCategories} currency={currency} /> },
     { name: 'Categorías', icon: <RestaurantMenuIcon />, component: <CategoryManager categories={categories} setCategories={setCategories} currency={currency} setCurrency={setCurrency} standalone /> },
-    { name: 'Empleados', icon: <PeopleIcon />, component: <Employees /> },
+    { name: 'Roles', icon: <PeopleIcon />, component: <RoleManager roles={roles} setRoles={setRoles} /> },
+    { name: 'Empleados', icon: <PeopleIcon />, component: <Employees roles={roles} setRoles={setRoles} /> },
     { name: 'Reportes', icon: <BarChartIcon />, component: <Reports /> },
   ];
 

@@ -64,7 +64,22 @@ export default function Menu({ categories, setCategories }) {
   // Edición y eliminación de categorías ahora se gestiona en CategoryManager
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyData, setHistoryData] = useState([]);
-  const [menu, setMenu] = useState(initialMenu);
+  // Persistencia de menú en localStorage
+  const [menu, setMenu] = useState(() => {
+    const stored = localStorage.getItem('menu');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return parsed;
+      } catch {}
+    }
+    return initialMenu;
+  });
+
+  // Guardar menú en localStorage cada vez que cambian
+  React.useEffect(() => {
+    localStorage.setItem('menu', JSON.stringify(menu));
+  }, [menu]);
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [subcategoryFilter, setSubcategoryFilter] = useState('');

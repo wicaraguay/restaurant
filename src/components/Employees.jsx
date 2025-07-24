@@ -27,7 +27,7 @@ import {
   Switch
 } from '@mui/material';
 
-function Employees() {
+function Employees({ roles, setRoles }) {
   // Manejo de foto
   const handlePhotoChange = e => {
     const file = e.target.files[0];
@@ -43,36 +43,51 @@ function Employees() {
   const handleRemovePhoto = () => {
     setForm(f => ({ ...f, photo: '' }));
   };
-  // Datos de ejemplo iniciales
-  const [employees, setEmployees] = useState([
-    {
-      id: 1,
-      name: 'Juan Pérez',
-      cedula: '12345678',
-      role: 'Mesero',
-      phone: '555-1234',
-      active: true,
-      photo: '',
-      notes: 'Empleado destacado por atención al cliente.',
-      history: [
-        { date: '2025-07-01', action: 'Creado' },
-        { date: '2025-07-10', action: 'Actualizado' }
-      ]
-    },
-    {
-      id: 2,
-      name: 'Ana Gómez',
-      cedula: '87654321',
-      role: 'Cocinero',
-      phone: '555-5678',
-      active: false,
-      photo: '',
-      notes: '',
-      history: [
-        { date: '2025-07-02', action: 'Creado' }
-      ]
+  // Persistencia de empleados en localStorage
+  const [employees, setEmployees] = useState(() => {
+    const stored = localStorage.getItem('employees');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return parsed;
+      } catch {}
     }
-  ]);
+    // Datos de ejemplo iniciales
+    return [
+      {
+        id: 1,
+        name: 'Juan Pérez',
+        cedula: '12345678',
+        role: 'Mesero',
+        phone: '555-1234',
+        active: true,
+        photo: '',
+        notes: 'Empleado destacado por atención al cliente.',
+        history: [
+          { date: '2025-07-01', action: 'Creado' },
+          { date: '2025-07-10', action: 'Actualizado' }
+        ]
+      },
+      {
+        id: 2,
+        name: 'Ana Gómez',
+        cedula: '87654321',
+        role: 'Cocinero',
+        phone: '555-5678',
+        active: false,
+        photo: '',
+        notes: '',
+        history: [
+          { date: '2025-07-02', action: 'Creado' }
+        ]
+      }
+    ];
+  });
+
+  // Guardar empleados en localStorage cada vez que cambian
+  React.useEffect(() => {
+    localStorage.setItem('employees', JSON.stringify(employees));
+  }, [employees]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const pageSize = 5;
@@ -82,7 +97,13 @@ function Employees() {
   const [errors, setErrors] = useState({});
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyData, setHistoryData] = useState([]);
-  const roles = ['Mesero', 'Cocinero', 'Administrador', 'Cajero'];
+  // roles ahora viene como prop desde App.jsx
+  // Para obtener los privilegios del rol seleccionado
+  const getPrivilegesForRole = (role) => {
+    if (!role) return [];
+    if (typeof role === 'string') return [];
+    return Array.isArray(role.privileges) ? role.privileges : [];
+  };
 
   // Filtrado de empleados
   const filtered = employees.filter(e => {
@@ -95,7 +116,6 @@ function Employees() {
       (e.active ? 'activo' : 'inactivo').includes(term)
     );
   });
-  // ...existing code...
   // Paginación
   const totalPages = Math.ceil(filtered.length / pageSize);
   const paginated = filtered.slice((page - 1) * pageSize, page * pageSize);
@@ -282,7 +302,18 @@ function Employees() {
               </Avatar>
               <Typography variant="h6" sx={{ fontWeight: 700, color: '#2d3a4a', mb: 1 }}>{emp.name}</Typography>
               <Typography variant="body2" sx={{ color: '#607d8b', mb: 1 }}>Cédula: {emp.cedula}</Typography>
-              <Typography variant="body2" sx={{ color: '#607d8b', mb: 1 }}>{emp.role}</Typography>
+              <Typography variant="body2" sx={{ color: '#607d8b', mb: 1 }}>{typeof emp.role === 'object' ? emp.role.name : emp.role}</Typography>
+              {/* Mostrar privilegios si existen */}
+              {getPrivilegesForRole(emp.role).length > 0 && (
+                <Box sx={{ mb: 1, width: '100%' }}>
+                  <Typography variant="caption" sx={{ color: '#1976d2', fontWeight: 600, textAlign: 'center', display: 'block', mb: 0.5 }}>Privilegios:</Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: 'center' }}>
+                    {getPrivilegesForRole(emp.role).map((priv, idx) => (
+                      <Typography key={idx} variant="caption" sx={{ background: '#e3f2fd', color: '#1976d2', px: 1, py: 0.5, borderRadius: 1, fontWeight: 500 }}>{priv}</Typography>
+                    ))}
+                  </Box>
+                </Box>
+              )}
               <Typography variant="body2" sx={{ color: '#607d8b', mb: 2 }}>Tel: {emp.phone}</Typography>
               {emp.notes && (
                 <Typography variant="body2" sx={{ color: '#8d5524', mb: 1, fontStyle: 'italic', textAlign: 'center', px: 1 }}>
@@ -336,6 +367,17 @@ function Employees() {
                   </Button>
                 )}
               </Box>
+              {/* Mostrar privilegios del rol seleccionado en el formulario */}
+              {getPrivilegesForRole(form.role).length > 0 && (
+                <Box sx={{ mt: 2, width: '100%' }}>
+                  <Typography variant="caption" sx={{ color: '#1976d2', fontWeight: 600, textAlign: 'center', display: 'block', mb: 0.5 }}>Privilegios del cargo:</Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: 'center' }}>
+                    {getPrivilegesForRole(form.role).map((priv, idx) => (
+                      <Typography key={idx} variant="caption" sx={{ background: '#e3f2fd', color: '#1976d2', px: 1, py: 0.5, borderRadius: 1, fontWeight: 500 }}>{priv}</Typography>
+                    ))}
+                  </Box>
+                </Box>
+              )}
             </Box>
             <TextField
               label="Notas o comentarios internos"
@@ -369,16 +411,24 @@ function Employees() {
               <InputLabel id="role-label">Cargo</InputLabel>
               <Select
                 labelId="role-label"
-                value={form.role}
+                value={typeof form.role === 'object' ? form.role.name : form.role}
                 label="Cargo"
-                onChange={e => setForm({ ...form, role: e.target.value })}
+                onChange={e => {
+                  const value = e.target.value;
+                  // Buscar el objeto completo en roles
+                  const selected = roles.find(r => (typeof r === 'string' ? r === value : r.name === value));
+                  setForm({ ...form, role: selected });
+                }}
                 required
                 error={!!errors.role}
                 sx={{ background: '#fff', borderRadius: 2 }}
               >
-                {roles.map(role => (
-                  <MenuItem key={role} value={role}>{role}</MenuItem>
-                ))}
+                {roles.map((role, idx) => {
+                  if (typeof role === 'string') {
+                    return <MenuItem key={role} value={role}>{role}</MenuItem>;
+                  }
+                  return <MenuItem key={role.name || idx} value={role.name}>{role.name}</MenuItem>;
+                })}
               </Select>
               {errors.role && <Typography color="error" variant="caption">{errors.role}</Typography>}
             </FormControl>
