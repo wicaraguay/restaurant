@@ -293,7 +293,7 @@ export default function Menu() {
       <Box sx={{
         display: 'grid',
         gridTemplateColumns: {
-          xs: 'repeat(1, 1fr)',
+          xs: 'repeat(2, 1fr)',
           sm: 'repeat(2, 1fr)',
           md: 'repeat(3, 1fr)',
           lg: 'repeat(4, 1fr)',
