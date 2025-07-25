@@ -265,89 +265,137 @@ function Employees({ roles, setRoles }) {
         <Box sx={{
           display: 'grid',
           gridTemplateColumns: {
-            xs: 'repeat(2, 1fr)',
+            xs: '1fr',
             sm: 'repeat(2, 1fr)',
             md: 'repeat(3, 1fr)',
             lg: 'repeat(4, 1fr)',
             xl: 'repeat(5, 1fr)'
           },
-          gap: { xs: 2, sm: 3 },
+          gap: { xs: 2.5, sm: 3 },
           mt: 0,
           mb: 0,
           width: '100%',
           maxWidth: { xs: '100%', sm: 600, md: 900, lg: 1200 },
           minHeight: { xs: 'auto', sm: 'calc(60vh - 32px)' },
           mx: 'auto',
-          px: { xs: 1, sm: 2, md: 3, lg: 4 },
+          px: { xs: 0.5, sm: 2, md: 3, lg: 4 },
           overflow: 'hidden',
         }}>
-          {paginated.map(emp => (
-            <Paper key={emp.id} elevation={3} sx={{
-              p: { xs: 2, sm: 3 },
-              borderRadius: 3,
-              background: '#fff',
-              boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              aspectRatio: '1 / 1',
-              minWidth: { xs: 140, sm: 180 },
-              maxWidth: { xs: 180, sm: 220 },
-              width: '100%',
-              position: 'relative',
-              justifyContent: 'flex-start',
-            }}>
-              <Avatar
-                src={emp.photo}
-                alt={emp.name}
-                sx={{ width: 64, height: 64, mb: 2, bgcolor: '#e0e7ef', fontWeight: 700, fontSize: 28 }}
-              >
-                {!emp.photo && emp.name.split(' ').map(n => n[0]).join('')}
-              </Avatar>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: '#2d3a4a', mb: 1 }}>{emp.name}</Typography>
-              <Typography variant="body2" sx={{ color: '#607d8b', mb: 1 }}>Cédula: {emp.cedula}</Typography>
-              <Typography variant="body2" sx={{ color: '#607d8b', mb: 1 }}>{typeof emp.role === 'object' ? emp.role.name : emp.role}</Typography>
-              {/* Mostrar privilegios si existen */}
-              {getPrivilegesForRole(emp.role).length > 0 && (
-                <Box sx={{ mb: 1, width: '100%' }}>
-                  <Typography variant="caption" sx={{ color: '#1976d2', fontWeight: 600, textAlign: 'center', display: 'block', mb: 0.5 }}>Privilegios:</Typography>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: 'center' }}>
-                    {getPrivilegesForRole(emp.role).map((priv, idx) => (
-                      <Typography key={idx} variant="caption" sx={{ background: '#e3f2fd', color: '#1976d2', px: 1, py: 0.5, borderRadius: 1, fontWeight: 500 }}>{priv}</Typography>
-                    ))}
+          {paginated.map(emp => {
+            return (
+              <Paper key={emp.id} elevation={6} sx={{
+                p: { xs: 2, sm: 3 },
+                borderRadius: 5,
+                background: 'linear-gradient(135deg, #f8fafc 60%, #e0e7ef 100%)',
+                boxShadow: '0 4px 24px 0 #1976d222',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                minWidth: { xs: 0, sm: 200 },
+                maxWidth: { xs: 400, sm: 260 },
+                width: { xs: '98vw', sm: '100%' },
+                position: 'relative',
+                justifyContent: 'flex-start',
+                transition: 'transform 0.18s, box-shadow 0.18s',
+                '&:hover': {
+                  transform: { xs: 'none', sm: 'translateY(-6px) scale(1.035)' },
+                  boxShadow: { xs: '0 4px 24px 0 #1976d222', sm: '0 8px 32px 0 #1976d244' },
+                  borderColor: '#1976d2',
+                },
+              }}>
+                <Box sx={{ position: 'relative', mb: { xs: 2, sm: 2 } }}>
+                  <Avatar
+                    src={emp.photo}
+                    alt={emp.name}
+                    sx={{
+                      width: { xs: 88, sm: 72 },
+                      height: { xs: 88, sm: 72 },
+                      bgcolor: '#e0e7ef',
+                      fontWeight: 700,
+                      fontSize: { xs: 38, sm: 32 },
+                      border: '3px solid #1976d2',
+                      boxShadow: '0 2px 12px #1976d222',
+                    }}
+                  >
+                    {!emp.photo && emp.name.split(' ').map(n => n[0]).join('')}
+                  </Avatar>
+                  <Box sx={{
+                    position: 'absolute',
+                    bottom: -8,
+                    right: -8,
+                    zIndex: 2,
+                  }}>
+                    <Box sx={{
+                      px: 1.5,
+                      py: 0.5,
+                      borderRadius: 2,
+                      fontWeight: 700,
+                      fontSize: 12,
+                      color: emp.active ? '#fff' : '#fff',
+                      background: emp.active ? '#43a047' : '#d32f2f',
+                      boxShadow: '0 2px 8px #1976d222',
+                      letterSpacing: 0.5,
+                    }}>{emp.active ? 'Activo' : 'Inactivo'}</Box>
                   </Box>
                 </Box>
-              )}
-              <Typography variant="body2" sx={{ color: '#607d8b', mb: 2 }}>Tel: {emp.phone}</Typography>
-              {emp.notes && (
-                <Typography variant="body2" sx={{ color: '#8d5524', mb: 1, fontStyle: 'italic', textAlign: 'center', px: 1 }}>
-                  {emp.notes}
-                </Typography>
-              )}
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <Switch
-                  checked={emp.active}
-                  onChange={() => handleToggleActive(emp.id)}
-                  color="success"
-                  sx={{ mr: 1 }}
-                />
-                <Typography variant="body2" sx={{ fontWeight: 500, color: emp.active ? '#388e3c' : '#d32f2f' }}>
-                  {emp.active ? 'Activo' : 'Inactivo'}
-                </Typography>
-              </Box>
-              <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', gap: 2, mt: 'auto', pt: 2 }}>
-                <IconButton color="primary" onClick={() => handleOpen(emp)}>
-                  <EditIcon />
-                </IconButton>
-                <IconButton color="secondary" onClick={() => handleShowHistory(emp)}>
-                  <HistoryIcon />
-                </IconButton>
-                <IconButton color="error" onClick={() => handleDelete(emp.id)}>
-                  <DeleteIcon />
-                </IconButton>
-              </Box>
-            </Paper>
-          ))}
+                <Typography variant="h6" sx={{ fontWeight: 800, color: '#2d3a4a', mb: 0.5, letterSpacing: 0.5, textAlign: 'center', fontSize: { xs: 22, sm: 20 } }}>{emp.name}</Typography>
+                <Typography variant="body2" sx={{ color: '#607d8b', mb: 0.5, fontWeight: 500, textAlign: 'center', fontSize: { xs: 16, sm: 14 } }}>Cédula: {emp.cedula}</Typography>
+                <Typography variant="body2" sx={{ color: '#1976d2', mb: 1, fontWeight: 700, textAlign: 'center', letterSpacing: 0.2, fontSize: { xs: 16, sm: 14 } }}>{typeof emp.role === 'object' ? emp.role.name : emp.role}</Typography>
+                {/* Mostrar privilegios si existen */}
+                {getPrivilegesForRole(emp.role).length > 0 && (
+                  <Box sx={{ mb: 1, width: '100%' }}>
+                    <Typography variant="caption" sx={{ color: '#1976d2', fontWeight: 600, textAlign: 'center', display: 'block', mb: 0.5 }}>Privilegios:</Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: 'center' }}>
+                      {getPrivilegesForRole(emp.role).map((priv, idx) => (
+                        <Typography key={idx} variant="caption" sx={{ background: '#e3f2fd', color: '#1976d2', px: 1, py: 0.5, borderRadius: 1, fontWeight: 500 }}>{priv}</Typography>
+                      ))}
+                    </Box>
+                  </Box>
+                )}
+                <Typography variant="body2" sx={{ color: '#607d8b', mb: 1, fontWeight: 500, textAlign: 'center', fontSize: { xs: 16, sm: 14 } }}>Tel: {emp.phone}</Typography>
+                {emp.notes && (
+                  <Typography variant="body2" sx={{ color: '#8d5524', mb: 1, fontStyle: 'italic', textAlign: 'center', px: 1, fontWeight: 500, fontSize: { xs: 15, sm: 13 } }}>
+                    {emp.notes}
+                  </Typography>
+                )}
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2, mt: 1 }}>
+                  <Switch
+                    checked={emp.active}
+                    onChange={() => handleToggleActive(emp.id)}
+                    color="success"
+                    sx={{ mr: 1 }}
+                  />
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: emp.active ? '#388e3c' : '#d32f2f', letterSpacing: 0.5, fontSize: { xs: 16, sm: 14 } }}>
+                    {emp.active ? 'Activo' : 'Inactivo'}
+                  </Typography>
+                </Box>
+                <Box sx={{
+                  width: '100%',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  gap: 2,
+                  mt: 'auto',
+                  pt: 2,
+                  position: { xs: 'static', sm: 'absolute' },
+                  bottom: { xs: 'unset', sm: 12 },
+                  left: 0,
+                  right: 0,
+                  zIndex: 3,
+                  background: 'transparent',
+                }}>
+                  <IconButton color="primary" onClick={() => handleOpen(emp)} sx={{ bgcolor: '#e3f2fd', borderRadius: 2, boxShadow: '0 2px 8px #1976d222', '&:hover': { bgcolor: '#1976d2', color: '#fff' }, fontSize: { xs: 22, sm: 20 } }}>
+                    <EditIcon fontSize="inherit" />
+                  </IconButton>
+                  <IconButton color="secondary" onClick={() => handleShowHistory(emp)} sx={{ bgcolor: '#ede7f6', borderRadius: 2, boxShadow: '0 2px 8px #7b1fa244', '&:hover': { bgcolor: '#7b1fa2', color: '#fff' }, fontSize: { xs: 22, sm: 20 } }}>
+                    <HistoryIcon fontSize="inherit" />
+                  </IconButton>
+                  <IconButton color="error" onClick={() => handleDelete(emp.id)} sx={{ bgcolor: '#ffebee', borderRadius: 2, boxShadow: '0 2px 8px #d8431544', '&:hover': { bgcolor: '#d84315', color: '#fff' }, fontSize: { xs: 22, sm: 20 } }}>
+                    <DeleteIcon fontSize="inherit" />
+                  </IconButton>
+                </Box>
+              </Paper>
+            );
+          })}
         </Box>
         <Dialog open={open} onClose={() => setOpen(false)}>
           <DialogTitle sx={{ fontWeight: 700, color: '#2d3a4a', background: '#e0e7ef', borderBottom: '1px solid #cfd8dc' }}>{editId ? 'Editar empleado' : 'Agregar empleado'}</DialogTitle>
