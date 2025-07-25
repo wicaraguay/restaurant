@@ -53,6 +53,7 @@ export default function Orders({ menuByDay, selectedDay }) {
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState({ mesa: '', cliente: '', platillos: [], estado: 'pendiente', notas: '' });
   const [snackbar, setSnackbar] = useState({ open: false, message: '' });
+  const [alert, setAlert] = useState({ open: false, message: '' });
   const [filter, setFilter] = useState('');
   const [mesaSeleccionada, setMesaSeleccionada] = useState(null);
   const estados = [
@@ -218,16 +219,16 @@ export default function Orders({ menuByDay, selectedDay }) {
       <Grid container spacing={3} sx={{ width: '100%', maxWidth: 1200, mx: 'auto', alignItems: 'flex-start' }}>
         {/* Mesas */}
         <Grid item xs={12} md={4}>
-          <Typography variant="h6" sx={{ mb: 2, color: '#1976d2', fontWeight: 700, textAlign: 'center' }}>Mesas</Typography>
           <Box sx={{
             display: 'grid',
             gridTemplateColumns: {
               xs: 'repeat(2, 1fr)',
-              sm: 'repeat(3, 1fr)',
-              md: 'repeat(4, 1fr)',
+              sm: 'repeat(2, 1fr)',
+              md: 'repeat(3, 1fr)',
               lg: 'repeat(5, 1fr)'
             },
-            gap: 2
+            gap: { xs: 1.2, sm: 2 },
+            pb: { xs: 1, sm: 0 }
           }}>
             {mesas.map((mesa, idx) => {
               const pedido = orders.find(o => o.mesa === mesa);
@@ -238,23 +239,32 @@ export default function Orders({ menuByDay, selectedDay }) {
               return (
                 <Paper
                   key={mesa}
-                  elevation={isSelected ? 8 : 3}
+                  elevation={isSelected ? 12 : 4}
                   sx={{
-                    p: 2,
-                    borderRadius: 3,
-                    background: isSelected ? '#fffbe6' : '#fff',
-                    boxShadow: isSelected ? '0 4px 16px #ffe082' : '0 2px 12px rgba(0,0,0,0.08)',
+                    p: { xs: 1.2, sm: 2.5 },
+                    borderRadius: { xs: 3, sm: 4 },
+                    background: isSelected
+                      ? 'linear-gradient(135deg, #fffbe6 60%, #ffe082 100%)'
+                      : 'linear-gradient(135deg, #f8fafc 60%, #e0e7ef 100%)',
+                    boxShadow: isSelected
+                      ? '0 6px 24px 0 #ffe082, 0 1.5px 8px 0 #fbc02d44'
+                      : '0 2px 12px 0 #b0bec540',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     cursor: 'pointer',
                     border: isSelected ? '2.5px solid #fbc02d' : '2px solid #e0e0e0',
-                    minHeight: 100,
+                    minHeight: { xs: 100, sm: 120 },
                     width: '100%',
-                    maxWidth: 200,
-                    transition: 'box-shadow 0.2s, border 0.2s',
-                    mb: 1,
+                    maxWidth: { xs: '100%', sm: 220 },
+                    transition: 'box-shadow 0.2s, border 0.2s, background 0.2s',
+                    mb: { xs: 1, sm: 1.5 },
                     position: 'relative',
+                    '&:hover': {
+                      boxShadow: '0 8px 32px 0 #ffe082, 0 2px 12px 0 #fbc02d44',
+                      border: '2.5px solid #fbc02d',
+                      background: 'linear-gradient(135deg, #fffde7 60%, #ffe082 100%)',
+                    },
                   }}
                   onClick={() => {
                     setMesaSeleccionada(mesa);
@@ -281,6 +291,10 @@ export default function Orders({ menuByDay, selectedDay }) {
                       sx={{ position: 'absolute', top: 6, right: 6, zIndex: 2, color: '#e53935', background: '#fff', boxShadow: 1 }}
                       onClick={e => {
                         e.stopPropagation();
+                        if (tienePlatillos) {
+                          setAlert({ open: true, message: `No se puede eliminar la mesa ${mesa} porque está ocupada.\nLibere la mesa antes de eliminarla.` });
+                          return;
+                        }
                         setMesas(mesas.filter((m, i) => i !== idx));
                         // Eliminar pedido asociado si existe
                         setOrders(orders.filter(o => o.mesa !== mesa));
@@ -289,28 +303,65 @@ export default function Orders({ menuByDay, selectedDay }) {
                       <CancelIcon fontSize="small" />
                     </IconButton>
                   )}
-                  <TableRestaurantIcon sx={{ color: tienePedido ? '#fbc02d' : '#1976d2', fontSize: 36, mb: 1 }} />
-                  <Typography variant="body1" sx={{ fontWeight: 700, color: '#2d3a4a', textAlign: 'center', fontSize: 16 }}>
-                    Mesa {mesa}
-                    {cliente && ` - ${cliente}`}
+                  <Box sx={{
+                    width: { xs: 44, sm: 56 },
+                    height: { xs: 44, sm: 56 },
+                    borderRadius: '50%',
+                    background: tienePlatillos ? 'linear-gradient(135deg, #ffe082 60%, #ffd54f 100%)' : 'linear-gradient(135deg, #e3f2fd 60%, #bbdefb 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: tienePlatillos ? '0 2px 8px #ffd54f88' : '0 1px 4px #90caf988',
+                    mb: { xs: 1, sm: 1.5 },
+                  }}>
+                    <TableRestaurantIcon sx={{ color: tienePlatillos ? '#fbc02d' : '#1976d2', fontSize: { xs: 26, sm: 34 } }} />
+                  </Box>
+                  <Typography variant="h6" sx={{ fontWeight: 800, color: '#2d3a4a', textAlign: 'center', fontSize: 18, letterSpacing: 1, mb: 0.5 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#2d3a4a', textAlign: 'center', fontSize: { xs: 15, sm: 18 }, letterSpacing: 1, mb: { xs: 0.2, sm: 0.5 } }}>
+                      Mesa {mesa}
+                    </Typography>
                   </Typography>
+                  {cliente && (
+                    <Typography variant="body2" sx={{ color: '#607d8b', fontWeight: 500, textAlign: 'center', fontSize: 14, mb: 0.5, maxWidth: '90%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: 0.2 }}>
+                      {cliente}
+                    </Typography>
+                  )}
                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-                    <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 1, width: '100%', mb: 0.5, mt: 1 }}>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        {tienePlatillos
-                          ? <Chip label="Ocupada" color="error" size="small" />
-                          : <Chip label="Disponible" color="success" size="small" />}
-                      </Box>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        {tienePlatillos
-                          ? <Chip label={estados.find(e => e.value === pedido.estado)?.label || 'Pendiente'} color={estados.find(e => e.value === pedido.estado)?.color || 'warning'} size="small" />
-                          : <Typography variant="caption" sx={{ color: '#bdbdbd', fontStyle: 'italic' }}>Sin pedido</Typography>}
-                      </Box>
+                    <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 1.2, width: '100%', mb: 1, mt: 1 }}>
+                      <Chip
+                        label={tienePlatillos ? 'Ocupada' : 'Disponible'}
+                        color={tienePlatillos ? 'error' : 'success'}
+                        size="small"
+                        sx={{ fontWeight: 700, fontSize: 12, px: 1.2, borderRadius: 2, letterSpacing: 0.5, background: tienePlatillos ? '#fff3e0' : '#e3fcef', color: tienePlatillos ? '#d84315' : '#388e3c', border: '1px solid #ffe082' }}
+                      />
+                      {!tienePlatillos && (
+                        <Typography variant="caption" sx={{ color: '#bdbdbd', fontStyle: 'italic', fontSize: 13, ml: 1 }}>
+                          Sin pedido
+                        </Typography>
+                      )}
                     </Box>
                     <Button
                       size="small"
-                      variant="outlined"
-                      sx={{ mb: 1, fontSize: 13, py: 1, px: 2 }}
+                      variant={tienePlatillos ? 'contained' : 'outlined'}
+                      color={tienePlatillos ? 'warning' : 'primary'}
+                      sx={{
+                        mb: 0.5,
+                        fontSize: 14,
+                        py: 1,
+                        px: 2.5,
+                        fontWeight: 700,
+                        borderRadius: 2.5,
+                        boxShadow: tienePlatillos ? '0 2px 8px #ffe08288' : 'none',
+                        letterSpacing: 0.5,
+                        background: tienePlatillos ? 'linear-gradient(90deg, #ffe082 60%, #ffd54f 100%)' : undefined,
+                        color: tienePlatillos ? '#6d4c00' : undefined,
+                        border: tienePlatillos ? '1.5px solid #ffd54f' : undefined,
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          background: tienePlatillos ? 'linear-gradient(90deg, #ffd54f 60%, #ffe082 100%)' : undefined,
+                          color: tienePlatillos ? '#4e3400' : undefined,
+                        },
+                      }}
                       onClick={e => { e.stopPropagation(); tienePedido && tienePlatillos && setPedidoPopup(pedido); }}
                       disabled={!tienePedido || !tienePlatillos}
                     >
@@ -580,6 +631,34 @@ export default function Orders({ menuByDay, selectedDay }) {
         message={snackbar.message}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       />
+
+      {/* Alerta para intento de eliminar mesa ocupada */}
+      <Dialog
+        open={alert.open}
+        onClose={() => setAlert({ open: false, message: '' })}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            p: 2,
+            background: '#fff8e1',
+            border: '2px solid #ffb300',
+            boxShadow: '0 4px 24px #ffe082',
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: '#e65100', fontWeight: 700, fontSize: 20, textAlign: 'center', pb: 0 }}>
+          <CancelIcon sx={{ color: '#e65100', fontSize: 32, mb: -0.5, mr: 1 }} />
+          Mesa ocupada
+        </DialogTitle>
+        <DialogContent sx={{ textAlign: 'center', pt: 1, pb: 2 }}>
+          <Typography sx={{ color: '#6d4c41', fontSize: 16, whiteSpace: 'pre-line' }}>{alert.message}</Typography>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', pb: 2 }}>
+          <Button onClick={() => setAlert({ open: false, message: '' })} variant="contained" color="warning" sx={{ fontWeight: 700, px: 4, borderRadius: 2 }}>Aceptar</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 
