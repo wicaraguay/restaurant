@@ -231,9 +231,14 @@ export default function Orders({ menuByDay, selectedDay }) {
           <Typography variant="h6" sx={{ mb: 2, color: '#1976d2', fontWeight: 700 }}>Mesas</Typography>
           <Box
             sx={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: { xs: 1, sm: 2 },
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: 'repeat(2, 1fr)', // 2 columnas en móviles
+                sm: 'repeat(3, 1fr)', // 3 en tablets
+                md: 'repeat(4, 1fr)', // 4 en desktop
+                lg: 'repeat(6, 1fr)', // 6 en pantallas grandes
+              },
+              gap: { xs: 1, sm: 2 },
             }}
           >
             {mesas.map(mesa => {
@@ -247,7 +252,7 @@ export default function Orders({ menuByDay, selectedDay }) {
                   key={mesa}
                   elevation={3}
                   sx={{
-                    p: 2,
+                    p: { xs: 1, sm: 2 },
                     borderRadius: 3,
                     background: isSelected ? '#fffbe6' : '#fff',
                     boxShadow: isSelected ? '0 4px 16px #ffe082' : '0 2px 12px rgba(0,0,0,0.08)',
@@ -256,7 +261,10 @@ export default function Orders({ menuByDay, selectedDay }) {
                     alignItems: 'center',
                     cursor: 'pointer',
                     border: isSelected ? '2px solid #fbc02d' : '2px solid #e0e0e0',
-                    minHeight: 120
+                    minHeight: { xs: 90, sm: 120 },
+                    width: '100%',
+                    maxWidth: { xs: '100%', sm: 180, md: 200 },
+                    transition: 'box-shadow 0.2s, border 0.2s',
                   }}
                   onClick={() => {
                     if (tienePedido) {
@@ -276,28 +284,28 @@ export default function Orders({ menuByDay, selectedDay }) {
                     }
                   }}
                 >
-                  <TableRestaurantIcon sx={{ color: tienePedido ? '#fbc02d' : '#1976d2', fontSize: 36, mb: 1 }} />
-                  <Typography variant="body1" sx={{ fontWeight: 700, color: '#2d3a4a', textAlign: 'center' }}>
-                    Mesa {mesa}
-                    {cliente && ` - ${cliente}`}
-                  </Typography>
+                    <TableRestaurantIcon sx={{ color: tienePedido ? '#fbc02d' : '#1976d2', fontSize: { xs: 28, sm: 36 }, mb: 1 }} />
+                    <Typography variant="body1" sx={{ fontWeight: 700, color: '#2d3a4a', textAlign: 'center', fontSize: { xs: 14, sm: 16 } }}>
+                      Mesa {mesa}
+                      {cliente && ` - ${cliente}`}
+                    </Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
                     <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 1, width: '100%', mb: 0.5, mt: 1 }}>
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         {tienePlatillos
-                          ? <Chip label="Ocupada" color="error" size="small" />
-                          : <Chip label="Disponible" color="success" size="small" />}
+                          ? <Chip label="Ocupada" color="error" size="small" sx={{ fontSize: { xs: 10, sm: 12 } }} />
+                          : <Chip label="Disponible" color="success" size="small" sx={{ fontSize: { xs: 10, sm: 12 } }} />}
                       </Box>
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         {tienePlatillos
-                          ? <Chip label={estados.find(e => e.value === pedido.estado)?.label || 'Pendiente'} color={estados.find(e => e.value === pedido.estado)?.color || 'warning'} size="small" />
-                          : <Typography variant="caption" sx={{ color: '#bdbdbd', fontStyle: 'italic' }}>Sin pedido</Typography>}
+                          ? <Chip label={estados.find(e => e.value === pedido.estado)?.label || 'Pendiente'} color={estados.find(e => e.value === pedido.estado)?.color || 'warning'} size="small" sx={{ fontSize: { xs: 10, sm: 12 } }} />
+                          : <Typography variant="caption" sx={{ color: '#bdbdbd', fontStyle: 'italic', fontSize: { xs: 10, sm: 12 } }}>Sin pedido</Typography>}
                       </Box>
                     </Box>
                     <Button
                       size="small"
                       variant="outlined"
-                      sx={{ mb: 1 }}
+                      sx={{ mb: 1, fontSize: { xs: 11, sm: 13 }, py: { xs: 0.5, sm: 1 }, px: { xs: 1, sm: 2 } }}
                       onClick={e => { e.stopPropagation(); tienePedido && setPedidoPopup(pedido); }}
                       disabled={!tienePedido}
                     >
@@ -388,8 +396,15 @@ export default function Orders({ menuByDay, selectedDay }) {
         </Box>
       </Box>
       {/* Popup para ver pedido */}
-      <Dialog open={!!pedidoPopup} onClose={() => setPedidoPopup(null)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      <Dialog open={!!pedidoPopup} onClose={() => setPedidoPopup(null)} maxWidth="xs" fullWidth PaperProps={{
+        sx: {
+          m: { xs: 1, sm: 2 },
+          width: '100%',
+          maxWidth: { xs: '98vw', sm: 500 },
+          borderRadius: { xs: 2, sm: 3 },
+        }
+      }}>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 2, fontSize: { xs: 16, sm: 20 } }}>
           Pedido de Mesa {pedidoPopup?.mesa}
           {pedidoPopup && (
             Array.isArray(pedidoPopup.platillos) && pedidoPopup.platillos.length > 0 ?
@@ -397,7 +412,7 @@ export default function Orders({ menuByDay, selectedDay }) {
               <Chip label="Disponible" color="success" size="small" />
           )}
         </DialogTitle>
-        <DialogContent dividers sx={{ p: 0 }}>
+        <DialogContent dividers sx={{ p: { xs: 0, sm: 1 } }}>
           {pedidoPopup && (
             <>
               {/* Tabs para Detalles y Menú */}
@@ -409,14 +424,14 @@ export default function Orders({ menuByDay, selectedDay }) {
                 indicatorColor="primary"
                 textColor="primary"
                 variant="fullWidth"
-                sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}
+                sx={{ borderBottom: 1, borderColor: 'divider', mb: 2, minHeight: { xs: 32, sm: 48 } }}
               >
-                <Tab label="Detalles del pedido" />
-                <Tab label="Menú del día" />
+                <Tab label="Detalles del pedido" sx={{ fontSize: { xs: 12, sm: 15 } }} />
+                <Tab label="Menú del día" sx={{ fontSize: { xs: 12, sm: 15 } }} />
               </Tabs>
               {/* Contenido de la pestaña Detalles */}
               {(!pedidoPopup.tabIndex || pedidoPopup.tabIndex === 0) && (
-                <Box sx={{ p: 2 }}>
+                <Box sx={{ p: { xs: 1, sm: 2 } }}>
                   {/* Cliente editable */}
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                     <Typography variant="subtitle2" sx={{ mr: 1 }}>Cliente:</Typography>
@@ -457,8 +472,8 @@ export default function Orders({ menuByDay, selectedDay }) {
                     {Array.isArray(pedidoPopup.platillos) && pedidoPopup.platillos.length > 0 ? pedidoPopup.platillos.map((p, idx) => {
                       const platillo = menuByDay[selectedDay]?.find(m => m.name === p.name);
                       return (
-                        <Paper key={idx} sx={{ display: 'flex', alignItems: 'center', p: 1, mb: 1, borderRadius: 2, background: '#f8fafc' }}>
-                          <Typography sx={{ minWidth: 70, fontWeight: 600, fontSize: 14 }}>{p.name}</Typography>
+                        <Paper key={idx} sx={{ display: 'flex', alignItems: 'center', p: { xs: 0.5, sm: 1 }, mb: 1, borderRadius: 2, background: '#f8fafc', flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
+                          <Typography sx={{ minWidth: 70, fontWeight: 600, fontSize: { xs: 13, sm: 14 } }}>{p.name}</Typography>
                           <Button size="small" onClick={() => {
                             // Disminuir cantidad
                             if (p.cantidad <= 1) {
@@ -472,7 +487,7 @@ export default function Orders({ menuByDay, selectedDay }) {
                               setOrders(orders.map(o => o.id === pedidoPopup.id ? { ...o, platillos: nuevos } : o));
                             }
                           }} sx={{ minWidth: 28, fontWeight: 700, px: 0 }}>-</Button>
-                          <Typography sx={{ mx: 1, minWidth: 20, textAlign: 'center', fontWeight: 600, fontSize: 14 }}>{p.cantidad}</Typography>
+                          <Typography sx={{ mx: 1, minWidth: 20, textAlign: 'center', fontWeight: 600, fontSize: { xs: 13, sm: 14 } }}>{p.cantidad}</Typography>
                           <Button size="small" onClick={() => {
                             // Aumentar cantidad
                             const nuevos = pedidoPopup.platillos.map((pl, i) => i === idx ? { ...pl, cantidad: pl.cantidad + 1 } : pl);
@@ -485,7 +500,7 @@ export default function Orders({ menuByDay, selectedDay }) {
                             setPedidoPopup({ ...pedidoPopup, platillos: nuevos });
                             setOrders(orders.map(o => o.id === pedidoPopup.id ? { ...o, platillos: nuevos } : o));
                           }} sx={{ ml: 1, minWidth: 28, px: 0 }}>x</Button>
-                          <Typography sx={{ ml: 2, minWidth: 48, color: '#388e3c', fontWeight: 600, fontSize: 14 }}>
+                          <Typography sx={{ ml: 2, minWidth: 48, color: '#388e3c', fontWeight: 600, fontSize: { xs: 13, sm: 14 } }}>
                             ${platillo ? (platillo.price * p.cantidad).toFixed(2) : '0.00'}
                           </Typography>
                         </Paper>
@@ -504,7 +519,7 @@ export default function Orders({ menuByDay, selectedDay }) {
                     multiline
                     minRows={2}
                     maxRows={4}
-                    sx={{ mb: 2, background: '#fff', borderRadius: 2, mt: 2 }}
+                    sx={{ mb: 2, background: '#fff', borderRadius: 2, mt: 2, fontSize: { xs: 13, sm: 15 } }}
                   />
                   <Typography variant="h6" sx={{ color: '#388e3c', fontWeight: 700, textAlign: 'right', mt: 2 }}>
                     Total: ${Array.isArray(pedidoPopup.platillos) ? pedidoPopup.platillos.reduce((acc, p) => {
@@ -516,14 +531,14 @@ export default function Orders({ menuByDay, selectedDay }) {
               )}
               {/* Contenido de la pestaña Menú del día */}
               {pedidoPopup.tabIndex === 1 && (
-                <Box sx={{ p: 2 }}>
+                <Box sx={{ p: { xs: 1, sm: 2 } }}>
                   <Typography variant="h6" sx={{ color: '#1976d2', fontWeight: 700, mb: 2 }}>
                     Menú del día: {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}
                   </Typography>
                   <Box sx={{
                     display: 'grid',
                     gridTemplateColumns: {
-                      xs: '1fr 1fr',
+                      xs: '1fr',
                       sm: '1fr 1fr',
                       md: '1fr 1fr 1fr',
                     },
@@ -535,20 +550,20 @@ export default function Orders({ menuByDay, selectedDay }) {
                       menuByDay[selectedDay].map(platillo => {
                         const yaEnPedido = pedidoPopup.platillos.some(pl => pl.name === platillo.name);
                         return (
-                          <Paper key={platillo.id} elevation={2} sx={{ p: 2, borderRadius: 3, background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', alignItems: 'center', opacity: platillo.active ? 1 : 0.5, cursor: yaEnPedido ? 'not-allowed' : 'pointer', border: '1px solid #e0e0e0', minHeight: 180 }}>
-                            <Avatar src={platillo.photo} alt={platillo.name} sx={{ width: 48, height: 48, mb: 1, bgcolor: '#e0e7ef', fontWeight: 700, fontSize: 20 }}>
+                          <Paper key={platillo.id} elevation={2} sx={{ p: { xs: 1, sm: 2 }, borderRadius: 3, background: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', alignItems: 'center', opacity: platillo.active ? 1 : 0.5, cursor: yaEnPedido ? 'not-allowed' : 'pointer', border: '1px solid #e0e0e0', minHeight: { xs: 120, sm: 180 } }}>
+                            <Avatar src={platillo.photo} alt={platillo.name} sx={{ width: { xs: 36, sm: 48 }, height: { xs: 36, sm: 48 }, mb: 1, bgcolor: '#e0e7ef', fontWeight: 700, fontSize: { xs: 16, sm: 20 } }}>
                               {!platillo.photo && platillo.name.split(' ').map(n => n[0]).join('')}
                             </Avatar>
-                            <Typography variant="body1" sx={{ fontWeight: 700, color: '#2d3a4a', mb: 0.5 }}>{platillo.name}</Typography>
-                            <Typography variant="body2" sx={{ color: '#607d8b', mb: 0.5 }}>{platillo.category}</Typography>
-                            <Typography variant="body2" sx={{ color: '#388e3c', fontWeight: 600, mb: 0.5 }}>${platillo.price}</Typography>
-                            <Typography variant="caption" sx={{ color: '#607d8b', mb: 1, textAlign: 'center' }}>{platillo.description}</Typography>
-                            <Chip label={platillo.active ? 'Disponible' : 'No disponible'} color={platillo.active ? 'success' : 'default'} size="small" sx={{ mb: 1 }} />
+                            <Typography variant="body1" sx={{ fontWeight: 700, color: '#2d3a4a', mb: 0.5, fontSize: { xs: 13, sm: 16 } }}>{platillo.name}</Typography>
+                            <Typography variant="body2" sx={{ color: '#607d8b', mb: 0.5, fontSize: { xs: 12, sm: 14 } }}>{platillo.category}</Typography>
+                            <Typography variant="body2" sx={{ color: '#388e3c', fontWeight: 600, mb: 0.5, fontSize: { xs: 12, sm: 14 } }}>${platillo.price}</Typography>
+                            <Typography variant="caption" sx={{ color: '#607d8b', mb: 1, textAlign: 'center', fontSize: { xs: 11, sm: 12 } }}>{platillo.description}</Typography>
+                            <Chip label={platillo.active ? 'Disponible' : 'No disponible'} color={platillo.active ? 'success' : 'default'} size="small" sx={{ mb: 1, fontSize: { xs: 10, sm: 12 } }} />
                             <Button
                               size="small"
                               variant="outlined"
                               color="primary"
-                              sx={{ mt: 1 }}
+                              sx={{ mt: 1, fontSize: { xs: 11, sm: 13 }, py: { xs: 0.5, sm: 1 }, px: { xs: 1, sm: 2 } }}
                               disabled={yaEnPedido || !platillo.active}
                               onClick={() => {
                                 if (yaEnPedido || !platillo.active) return;
