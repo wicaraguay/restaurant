@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Tables from './components/Tables.jsx';
+// import Tables from './components/Tables.jsx';
 import Orders from './components/Orders.jsx';
 import Menu from './components/Menu.jsx';
 import Employees from './components/Employees.jsx';
@@ -69,7 +69,7 @@ function App() {
 
   const sections = [
     { name: 'Dashboard', icon: <DashboardIcon />, component: <Box sx={{p:2}}><Typography variant="h4" sx={{fontWeight:'bold',mb:2}}>Bienvenido al Panel de Gestión</Typography><Typography>Selecciona una sección en el menú lateral para comenzar.</Typography></Box> },
-    { name: 'Mesas', icon: <TableRestaurantIcon />, component: <Tables /> },
+    // { name: 'Mesas', icon: <TableRestaurantIcon />, component: <Tables /> },
     { name: 'Pedidos', icon: <ReceiptLongIcon />, component: <Orders menuByDay={menuByDay} selectedDay={selectedDay} /> },
     { name: 'Menú', icon: <RestaurantMenuIcon />, component: <Menu categories={categories} setCategories={setCategories} menuByDay={menuByDay} setMenuByDay={setMenuByDay} selectedDay={selectedDay} setSelectedDay={setSelectedDay} currency={currency} /> },
     { name: 'Categorías', icon: <CategoryIcon />, component: <CategoryManager categories={categories} setCategories={setCategories} currency={currency} setCurrency={setCurrency} standalone /> },
