@@ -228,7 +228,11 @@ export default function Orders({ menuByDay, selectedDay }) {
               lg: 'repeat(5, 1fr)'
             },
             gap: { xs: 1.2, sm: 2 },
-            pb: { xs: 1, sm: 0 }
+            pb: { xs: 1, sm: 0 },
+            width: '100%',
+            maxWidth: '100%',
+            boxSizing: 'border-box',
+            mx: 'auto',
           }}>
             {mesas.map((mesa, idx) => {
               const pedido = orders.find(o => o.mesa === mesa);
@@ -256,10 +260,11 @@ export default function Orders({ menuByDay, selectedDay }) {
                     border: isSelected ? '2.5px solid #fbc02d' : '2px solid #e0e0e0',
                     minHeight: { xs: 100, sm: 120 },
                     width: '100%',
-                    maxWidth: { xs: '100%', sm: 220 },
+                    maxWidth: '100%',
                     transition: 'box-shadow 0.2s, border 0.2s, background 0.2s',
                     mb: { xs: 1, sm: 1.5 },
                     position: 'relative',
+                    boxSizing: 'border-box',
                     '&:hover': {
                       boxShadow: '0 8px 32px 0 #ffe082, 0 2px 12px 0 #fbc02d44',
                       border: '2.5px solid #fbc02d',
