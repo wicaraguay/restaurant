@@ -284,7 +284,7 @@ function Employees({ roles, setRoles }) {
           {paginated.map(emp => {
             return (
               <Paper key={emp.id} elevation={6} sx={{
-                p: { xs: 2, sm: 3 },
+                p: { xs: 1.2, sm: 3 },
                 borderRadius: 5,
                 background: 'linear-gradient(135deg, #f8fafc 60%, #e0e7ef 100%)',
                 boxShadow: '0 4px 24px 0 #1976d222',
@@ -303,16 +303,16 @@ function Employees({ roles, setRoles }) {
                   borderColor: '#1976d2',
                 },
               }}>
-                <Box sx={{ position: 'relative', mb: { xs: 2, sm: 2 } }}>
+                <Box sx={{ position: 'relative', mb: { xs: 1.2, sm: 2 } }}>
                   <Avatar
                     src={emp.photo}
                     alt={emp.name}
                     sx={{
-                      width: { xs: 88, sm: 72 },
-                      height: { xs: 88, sm: 72 },
+                      width: { xs: 64, sm: 72 },
+                      height: { xs: 64, sm: 72 },
                       bgcolor: '#e0e7ef',
                       fontWeight: 700,
-                      fontSize: { xs: 38, sm: 32 },
+                      fontSize: { xs: 28, sm: 32 },
                       border: '3px solid #1976d2',
                       boxShadow: '0 2px 12px #1976d222',
                     }}
@@ -326,46 +326,49 @@ function Employees({ roles, setRoles }) {
                     zIndex: 2,
                   }}>
                     <Box sx={{
-                      px: 1.5,
-                      py: 0.5,
+                      px: 1.2,
+                      py: 0.3,
                       borderRadius: 2,
                       fontWeight: 700,
-                      fontSize: 12,
-                      color: emp.active ? '#fff' : '#fff',
+                      fontSize: { xs: 10, sm: 12 },
+                      color: '#fff',
                       background: emp.active ? '#43a047' : '#d32f2f',
                       boxShadow: '0 2px 8px #1976d222',
                       letterSpacing: 0.5,
                     }}>{emp.active ? 'Activo' : 'Inactivo'}</Box>
                   </Box>
                 </Box>
-                <Typography variant="h6" sx={{ fontWeight: 800, color: '#2d3a4a', mb: 0.5, letterSpacing: 0.5, textAlign: 'center', fontSize: { xs: 22, sm: 20 } }}>{emp.name}</Typography>
-                <Typography variant="body2" sx={{ color: '#607d8b', mb: 0.5, fontWeight: 500, textAlign: 'center', fontSize: { xs: 16, sm: 14 } }}>Cédula: {emp.cedula}</Typography>
-                <Typography variant="body2" sx={{ color: '#1976d2', mb: 1, fontWeight: 700, textAlign: 'center', letterSpacing: 0.2, fontSize: { xs: 16, sm: 14 } }}>{typeof emp.role === 'object' ? emp.role.name : emp.role}</Typography>
-                {/* Mostrar privilegios si existen */}
+                <Typography variant="h6" sx={{ fontWeight: 800, color: '#2d3a4a', mb: 0.2, letterSpacing: 0.5, textAlign: 'center', fontSize: { xs: 17, sm: 20 } }}>{emp.name}</Typography>
+                <Typography variant="body2" sx={{ color: '#607d8b', mb: 0.2, fontWeight: 500, textAlign: 'center', fontSize: { xs: 13, sm: 14 } }}>Cédula: {emp.cedula}</Typography>
+                <Typography variant="body2" sx={{ color: '#1976d2', mb: 0.5, fontWeight: 700, textAlign: 'center', letterSpacing: 0.2, fontSize: { xs: 13, sm: 14 } }}>{typeof emp.role === 'object' ? emp.role.name : emp.role}</Typography>
+                {/* Mostrar privilegios si existen, pero colapsados en móvil */}
                 {getPrivilegesForRole(emp.role).length > 0 && (
-                  <Box sx={{ mb: 1, width: '100%' }}>
-                    <Typography variant="caption" sx={{ color: '#1976d2', fontWeight: 600, textAlign: 'center', display: 'block', mb: 0.5 }}>Privilegios:</Typography>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: 'center' }}>
-                      {getPrivilegesForRole(emp.role).map((priv, idx) => (
-                        <Typography key={idx} variant="caption" sx={{ background: '#e3f2fd', color: '#1976d2', px: 1, py: 0.5, borderRadius: 1, fontWeight: 500 }}>{priv}</Typography>
+                  <Box sx={{ mb: 0.5, width: '100%' }}>
+                    <Typography variant="caption" sx={{ color: '#1976d2', fontWeight: 600, textAlign: 'center', display: 'block', mb: 0.2, fontSize: { xs: 11, sm: 12 } }}>Privilegios:</Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.3, justifyContent: 'center', maxHeight: { xs: 32, sm: 'none' }, overflow: { xs: 'hidden', sm: 'visible' } }}>
+                      {getPrivilegesForRole(emp.role).slice(0, 3).map((priv, idx) => (
+                        <Typography key={idx} variant="caption" sx={{ background: '#e3f2fd', color: '#1976d2', px: 0.7, py: 0.2, borderRadius: 1, fontWeight: 500, fontSize: { xs: 10, sm: 12 } }}>{priv}</Typography>
                       ))}
+                      {getPrivilegesForRole(emp.role).length > 3 && (
+                        <Typography variant="caption" sx={{ color: '#1976d2', fontWeight: 600, fontSize: { xs: 10, sm: 12 } }}>+{getPrivilegesForRole(emp.role).length - 3} más</Typography>
+                      )}
                     </Box>
                   </Box>
                 )}
-                <Typography variant="body2" sx={{ color: '#607d8b', mb: 1, fontWeight: 500, textAlign: 'center', fontSize: { xs: 16, sm: 14 } }}>Tel: {emp.phone}</Typography>
+                <Typography variant="body2" sx={{ color: '#607d8b', mb: 0.5, fontWeight: 500, textAlign: 'center', fontSize: { xs: 13, sm: 14 } }}>Tel: {emp.phone}</Typography>
                 {emp.notes && (
-                  <Typography variant="body2" sx={{ color: '#8d5524', mb: 1, fontStyle: 'italic', textAlign: 'center', px: 1, fontWeight: 500, fontSize: { xs: 15, sm: 13 } }}>
+                  <Typography variant="body2" sx={{ color: '#8d5524', mb: 0.5, fontStyle: 'italic', textAlign: 'center', px: 1, fontWeight: 500, fontSize: { xs: 12, sm: 13 } }}>
                     {emp.notes}
                   </Typography>
                 )}
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2, mt: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1, mt: 0.5 }}>
                   <Switch
                     checked={emp.active}
                     onChange={() => handleToggleActive(emp.id)}
                     color="success"
-                    sx={{ mr: 1 }}
+                    sx={{ mr: 1, transform: { xs: 'scale(0.85)', sm: 'scale(1)' } }}
                   />
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: emp.active ? '#388e3c' : '#d32f2f', letterSpacing: 0.5, fontSize: { xs: 16, sm: 14 } }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: emp.active ? '#388e3c' : '#d32f2f', letterSpacing: 0.5, fontSize: { xs: 13, sm: 14 } }}>
                     {emp.active ? 'Activo' : 'Inactivo'}
                   </Typography>
                 </Box>
@@ -373,9 +376,9 @@ function Employees({ roles, setRoles }) {
                   width: '100%',
                   display: 'flex',
                   justifyContent: 'center',
-                  gap: 2,
+                  gap: 1.2,
                   mt: 'auto',
-                  pt: 2,
+                  pt: 1,
                   position: { xs: 'static', sm: 'absolute' },
                   bottom: { xs: 'unset', sm: 12 },
                   left: 0,
@@ -383,13 +386,13 @@ function Employees({ roles, setRoles }) {
                   zIndex: 3,
                   background: 'transparent',
                 }}>
-                  <IconButton color="primary" onClick={() => handleOpen(emp)} sx={{ bgcolor: '#e3f2fd', borderRadius: 2, boxShadow: '0 2px 8px #1976d222', '&:hover': { bgcolor: '#1976d2', color: '#fff' }, fontSize: { xs: 22, sm: 20 } }}>
+                  <IconButton color="primary" onClick={() => handleOpen(emp)} sx={{ bgcolor: '#e3f2fd', borderRadius: 2, boxShadow: '0 2px 8px #1976d222', '&:hover': { bgcolor: '#1976d2', color: '#fff' }, fontSize: { xs: 18, sm: 20 }, p: { xs: 0.7, sm: 1 } }}>
                     <EditIcon fontSize="inherit" />
                   </IconButton>
-                  <IconButton color="secondary" onClick={() => handleShowHistory(emp)} sx={{ bgcolor: '#ede7f6', borderRadius: 2, boxShadow: '0 2px 8px #7b1fa244', '&:hover': { bgcolor: '#7b1fa2', color: '#fff' }, fontSize: { xs: 22, sm: 20 } }}>
+                  <IconButton color="secondary" onClick={() => handleShowHistory(emp)} sx={{ bgcolor: '#ede7f6', borderRadius: 2, boxShadow: '0 2px 8px #7b1fa244', '&:hover': { bgcolor: '#7b1fa2', color: '#fff' }, fontSize: { xs: 18, sm: 20 }, p: { xs: 0.7, sm: 1 } }}>
                     <HistoryIcon fontSize="inherit" />
                   </IconButton>
-                  <IconButton color="error" onClick={() => handleDelete(emp.id)} sx={{ bgcolor: '#ffebee', borderRadius: 2, boxShadow: '0 2px 8px #d8431544', '&:hover': { bgcolor: '#d84315', color: '#fff' }, fontSize: { xs: 22, sm: 20 } }}>
+                  <IconButton color="error" onClick={() => handleDelete(emp.id)} sx={{ bgcolor: '#ffebee', borderRadius: 2, boxShadow: '0 2px 8px #d8431544', '&:hover': { bgcolor: '#d84315', color: '#fff' }, fontSize: { xs: 18, sm: 20 }, p: { xs: 0.7, sm: 1 } }}>
                     <DeleteIcon fontSize="inherit" />
                   </IconButton>
                 </Box>
