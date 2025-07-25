@@ -86,20 +86,16 @@ export default function Menu({ categories, setCategories, menuByDay, setMenuByDa
     localStorage.setItem('menuByDay', JSON.stringify(menuByDay));
   }, [menuByDay]);
   const [search, setSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [subcategoryFilter, setSubcategoryFilter] = useState('');
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState({ name: '', category: '', subcategory: '', price: '', description: '', photo: '', active: true, special: false });
   const [errors, setErrors] = useState({});
   const [page, setPage] = useState(1);
-  const pageSize = 6;
+  const pageSize = 5;
 
   // Filtrado y búsqueda por día
   const filtered = menuByDay[selectedDay].filter(item => {
     const term = search.trim().toLowerCase();
-    if (categoryFilter && item.category !== categoryFilter) return false;
-    if (subcategoryFilter && item.subcategory !== subcategoryFilter) return false;
     if (!term) return true;
     return (
       item.name.toLowerCase().includes(term) ||
@@ -298,35 +294,6 @@ export default function Menu({ categories, setCategories, menuByDay, setMenuByDa
           onChange={e => { setSearch(e.target.value); setPage(1); }}
           sx={{ minWidth: 220, background: '#fff', borderRadius: 2, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
         />
-        <FormControl sx={{ minWidth: 160, background: '#fff', borderRadius: 2 }}>
-          <InputLabel id="cat-label">Categoría</InputLabel>
-          <Select
-            labelId="cat-label"
-            value={categoryFilter}
-            label="Categoría"
-            onChange={e => { setCategoryFilter(e.target.value); setSubcategoryFilter(''); setPage(1); }}
-          >
-            <MenuItem value="">Todas</MenuItem>
-            {categories.map(cat => (
-              <MenuItem key={cat.name} value={cat.name}>{cat.name}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl sx={{ minWidth: 160, background: '#fff', borderRadius: 2 }}>
-          <InputLabel id="subcat-label">Subcategoría</InputLabel>
-          <Select
-            labelId="subcat-label"
-            value={subcategoryFilter}
-            label="Subcategoría"
-            onChange={e => { setSubcategoryFilter(e.target.value); setPage(1); }}
-            disabled={!categoryFilter}
-          >
-            <MenuItem value="">Todas</MenuItem>
-            {categoryFilter && categories.find(c => c.name === categoryFilter)?.subcategories.map(sub => (
-              <MenuItem key={sub} value={sub}>{sub}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
         <Button variant="contained" color="primary" onClick={() => handleOpen()} sx={{ fontWeight: 600, borderRadius: 2, boxShadow: '0 2px 8px rgba(0,0,0,0.10)', px: 3 }}>
           <AddIcon sx={{ mr: 1 }} />
           Agregar platillo
@@ -334,10 +301,6 @@ export default function Menu({ categories, setCategories, menuByDay, setMenuByDa
         <Button variant="outlined" color="secondary" onClick={handleExportPDF} sx={{ fontWeight: 600, borderRadius: 2, px: 2 }}>
           <PictureAsPdfIcon sx={{ mr: 1 }} />
           Exportar PDF
-        </Button>
-        <Button variant="outlined" color="success" onClick={handleExportCSV} sx={{ fontWeight: 600, borderRadius: 2, px: 2 }}>
-          <FileDownloadIcon sx={{ mr: 1 }} />
-          Exportar Excel
         </Button>
       </Box>
       {/* Paginación */}
