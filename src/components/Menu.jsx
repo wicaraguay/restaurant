@@ -383,56 +383,78 @@ export default function Menu({ categories, setCategories, menuByDay, setMenuByDa
         overflow: 'hidden',
       }}>
         {paginated.map(item => (
-          <Paper key={item.id} elevation={3} sx={{
-            p: { xs: 2, sm: 3 },
-            borderRadius: 3,
-            background: '#fff',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            aspectRatio: '1 / 1',
-            minWidth: { xs: 140, sm: 180 },
-            maxWidth: { xs: 180, sm: 220 },
-            width: '100%',
-            position: 'relative',
-            justifyContent: 'flex-start',
-          }}>
-            <Avatar
-              src={item.photo}
-              alt={item.name}
-              sx={{ width: 64, height: 64, mb: 2, bgcolor: '#e0e7ef', fontWeight: 700, fontSize: 28 }}
-            >
-              {!item.photo && item.name.split(' ').map(n => n[0]).join('')}
-            </Avatar>
-            <Typography variant="h6" sx={{ fontWeight: 700, color: '#2d3a4a', mb: 1 }}>{item.name}</Typography>
-            <Typography variant="body2" sx={{ color: '#607d8b', mb: 1 }}>{item.category}</Typography>
-            <Typography variant="body2" sx={{ color: '#607d8b', mb: 1 }}>$ {item.price}</Typography>
-            <Typography variant="body2" sx={{ color: '#607d8b', mb: 2, textAlign: 'center' }}>{item.description}</Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <Paper
+            key={item.id}
+            elevation={3}
+            sx={{
+              p: { xs: 2, sm: 2.5 },
+              borderRadius: 4,
+              background: '#fff',
+              boxShadow: '0 4px 18px 0 #e0e7efcc',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'stretch',
+              minWidth: { xs: 140, sm: 180 },
+              maxWidth: { xs: 180, sm: 220 },
+              width: '100%',
+              height: '100%',
+              position: 'relative',
+              border: '1.5px solid #e0e7ef',
+              transition: 'box-shadow 0.2s, border 0.2s',
+              '&:hover': {
+                boxShadow: '0 8px 32px 0 #90caf944',
+                border: '2px solid #90caf9',
+              },
+            }}
+          >
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 1, width: '100%' }}>
+              <Avatar
+                src={item.photo}
+                alt={item.name}
+                sx={{ width: 54, height: 54, mb: 1, bgcolor: '#e3f2fd', fontWeight: 700, fontSize: 24, color: '#1976d2', border: '2px solid #90caf9', boxShadow: '0 2px 8px #90caf922' }}
+              >
+                {!item.photo && item.name.split(' ').map(n => n[0]).join('')}
+              </Avatar>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: '#263238', fontSize: 17, mb: 0.5, letterSpacing: 0.2, lineHeight: 1.1, textAlign: 'center', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</Typography>
+              <Typography variant="body2" sx={{ color: '#607d8b', fontWeight: 500, fontSize: 13, textAlign: 'center', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.category}</Typography>
+              {item.subcategory && (
+                <Typography variant="caption" sx={{ color: '#90caf9', fontWeight: 600, fontSize: 11, textAlign: 'center' }}>{item.subcategory}</Typography>
+              )}
+            </Box>
+            <Typography variant="body2" sx={{ color: '#37474f', mb: 1, fontWeight: 500, fontSize: 14, textAlign: 'center', minHeight: 32, maxHeight: 36, overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.description}</Typography>
+            <Typography variant="subtitle1" sx={{ color: '#1976d2', fontWeight: 900, fontSize: 17, textAlign: 'center', mb: 1 }}>
+              $ {item.price}
+            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1, mb: 1, width: '100%' }}>
+              <Button size="small" variant={item.active ? 'contained' : 'outlined'} color={item.active ? 'success' : 'error'} sx={{ fontWeight: 700, fontSize: 11, px: 1.5, py: 0.2, borderRadius: 2, minWidth: 0, boxShadow: 'none', textTransform: 'none' }}>
+                {item.active ? 'Disponible' : 'No disponible'}
+              </Button>
               <Switch
                 checked={item.active}
                 onChange={() => handleToggleActive(item.id)}
                 color="success"
-                sx={{ mr: 1 }}
+                sx={{ ml: 0.5 }}
               />
-              <Typography variant="body2" sx={{ fontWeight: 500, color: item.active ? '#388e3c' : '#d32f2f' }}>
-                {item.active ? 'Disponible' : 'No disponible'}
-              </Typography>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1, mb: 1, width: '100%' }}>
+              <Button size="small" variant={item.special ? 'contained' : 'outlined'} color="warning" sx={{ fontWeight: 700, fontSize: 11, px: 1.5, py: 0.2, borderRadius: 2, minWidth: 0, boxShadow: 'none', textTransform: 'none' }}>
+                {item.special ? 'Especial' : 'Normal'}
+              </Button>
               <Switch
                 checked={item.special}
                 onChange={() => handleToggleSpecial(item.id)}
                 color="warning"
-                sx={{ mr: 1 }}
+                sx={{ ml: 0.5 }}
               />
-              <Typography variant="body2" sx={{ fontWeight: 500, color: item.special ? '#fbc02d' : '#607d8b' }}>
-                {item.special ? 'Especial' : 'Normal'}
-              </Typography>
             </Box>
-            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', gap: 2, mt: 'auto', pt: 2 }}>
-              <IconButton color="primary" onClick={() => handleOpen(item)}>
+            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', gap: 1, mt: 'auto', pt: 1 }}>
+              <IconButton
+                color="primary"
+                onClick={e => {
+                  e.stopPropagation();
+                  handleOpen(item);
+                }}
+              >
                 <EditIcon />
               </IconButton>
               <IconButton color="secondary" onClick={() => { setHistoryData(item.history || []); setHistoryOpen(true); }}>
