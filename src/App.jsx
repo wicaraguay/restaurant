@@ -5,6 +5,7 @@ import Menu from './components/Menu.jsx';
 import Employees from './components/Employees.jsx';
 import RoleManager from './components/RoleManager.jsx';
 import Reports from './components/Reports.jsx';
+import DashboardFull from './components/DashboardFull.jsx';
 import CategoryManager from './components/CategoryManager.jsx';
 import AppBar from '@mui/material/AppBar';
 import IconButton from '@mui/material/IconButton';
@@ -68,7 +69,67 @@ function App() {
   }, [menuByDay]);
 
   const sections = [
-    { name: 'Dashboard', icon: <DashboardIcon />, component: <Box sx={{p:2}}><Typography variant="h4" sx={{fontWeight:'bold',mb:2}}>Bienvenido al Panel de Gestión</Typography><Typography>Selecciona una sección en el menú lateral para comenzar.</Typography></Box> },
+    {
+      name: 'Dashboard',
+      icon: <DashboardIcon />, 
+      component: (
+        <DashboardFull
+          resumen={{
+            ventasHoy: 120,
+            ventasSemana: 800,
+            ventasMes: 3200,
+            clientesHoy: 45,
+            platilloTop: 'Hamburguesa',
+            mesasOcupadas: 6,
+            mesasLibres: 4,
+            pedidosEnCurso: 3,
+            pedidosPendientes: 2,
+            ventasPorHora: [
+              { hora: '08:00', ventas: 5 }, { hora: '09:00', ventas: 8 }, { hora: '10:00', ventas: 12 },
+              { hora: '11:00', ventas: 20 }, { hora: '12:00', ventas: 30 }, { hora: '13:00', ventas: 25 },
+              { hora: '14:00', ventas: 18 }, { hora: '15:00', ventas: 10 }
+            ],
+            rankingPlatillos: [
+              { name: 'Hamburguesa', value: 30 }, { name: 'Pizza', value: 22 }, { name: 'Ensalada', value: 15 }, { name: 'Tacos', value: 10 }
+            ],
+            horasPico: [
+              { hora: '12:00', pedidos: 18 }, { hora: '13:00', pedidos: 22 }, { hora: '14:00', pedidos: 15 }
+            ]
+          }}
+          actividad={[
+            'Pedido #123 completado',
+            'Pedido #124 cancelado',
+            'Pedido #125 modificado',
+            'Pedido #126 pagado',
+            'Pedido #127 en curso'
+          ]}
+          alertas={[
+            'Pedido #128 lleva más de 30 minutos',
+            'Stock bajo: Papas Fritas'
+          ]}
+          comparativas={{
+            ventas: [
+              { periodo: 'Semana Actual', total: 1200 },
+              { periodo: 'Semana Anterior', total: 950 }
+            ],
+            empleados: [
+              { empleado: 'Ana', pedidos: 40 },
+              { empleado: 'Luis', pedidos: 32 },
+              { empleado: 'Pedro', pedidos: 28 }
+            ]
+          }}
+          mesas={[
+            { id: 1, ocupada: true }, { id: 2, ocupada: false }, { id: 3, ocupada: true }, { id: 4, ocupada: false },
+            { id: 5, ocupada: true }, { id: 6, ocupada: false }, { id: 7, ocupada: true }, { id: 8, ocupada: false },
+            { id: 9, ocupada: false }, { id: 10, ocupada: true }
+          ]}
+          feedback={{ promedio: 4.7 }}
+          onNuevoPedido={() => setSelected(sections.findIndex(s => s.name === 'Pedidos'))}
+          onIrReportes={() => setSelected(sections.findIndex(s => s.name === 'Reportes'))}
+          onIrMenu={() => setSelected(sections.findIndex(s => s.name === 'Menú'))}
+        />
+      )
+    },
     // { name: 'Mesas', icon: <TableRestaurantIcon />, component: <Tables /> },
     { name: 'Pedidos', icon: <ReceiptLongIcon />, component: <Orders menuByDay={menuByDay} selectedDay={selectedDay} /> },
     { name: 'Menú', icon: <RestaurantMenuIcon />, component: <Menu categories={categories} setCategories={setCategories} menuByDay={menuByDay} setMenuByDay={setMenuByDay} selectedDay={selectedDay} setSelectedDay={setSelectedDay} currency={currency} /> },
