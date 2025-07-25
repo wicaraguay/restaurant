@@ -19,7 +19,8 @@ import {
   Avatar,
   Tabs,
   Tab,
-  Switch
+  Switch,
+  Grid
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -60,7 +61,7 @@ export default function Orders({ menuByDay, selectedDay }) {
     { value: 'servido', label: 'Servido', color: 'success' },
     { value: 'pagado', label: 'Pagado', color: 'default' }
   ];
-  const mesas = ['1', '2', '3', '4', '5', '6', '7', '8'];
+  const [mesas, setMesas] = useState(['1', '2', '3', '4', '5']);
   const platillosEjemplo = ['Pollo a la brasa', 'Ceviche mixto', 'Lomo saltado', 'Jugo de maracuyá', 'Tarta de chocolate'];
 
   // Filtrado
@@ -214,34 +215,21 @@ export default function Orders({ menuByDay, selectedDay }) {
   return (
     <Box sx={{ width: '100%', minHeight: 'calc(100vh - 64px)', background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%)', fontFamily: 'Montserrat, Arial, sans-serif', p: { xs: 2, sm: 3, md: 4 } }}>
       <Typography variant="h4" sx={{ mb: 4, fontWeight: 700, textAlign: 'center', color: '#2d3a4a', letterSpacing: 1 }}>Gestión de Pedidos</Typography>
-      <Box
-        sx={{
-          display: 'flex',
-          gap: { xs: 2, sm: 3, md: 4 },
-          flexDirection: { xs: 'column', md: 'row' },
-          alignItems: { xs: 'stretch', md: 'flex-start' },
-          justifyContent: 'center',
-          width: '100%',
-          maxWidth: { xs: '100%', md: 1200 },
-          mx: 'auto',
-        }}
-      >
-        {/* Columna 1: Mesas */}
-        <Box sx={{ flex: 1, minWidth: { xs: '100%', sm: 220 }, maxWidth: { xs: '100%', md: 340 }, mb: { xs: 2, md: 0 } }}>
-          <Typography variant="h6" sx={{ mb: 2, color: '#1976d2', fontWeight: 700 }}>Mesas</Typography>
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: {
-                xs: 'repeat(2, 1fr)', // 2 columnas en móviles
-                sm: 'repeat(3, 1fr)', // 3 en tablets
-                md: 'repeat(4, 1fr)', // 4 en desktop
-                lg: 'repeat(6, 1fr)', // 6 en pantallas grandes
-              },
-              gap: { xs: 1, sm: 2 },
-            }}
-          >
-            {mesas.map(mesa => {
+      <Grid container spacing={3} sx={{ width: '100%', maxWidth: 1200, mx: 'auto', alignItems: 'flex-start' }}>
+        {/* Mesas */}
+        <Grid item xs={12} md={4}>
+          <Typography variant="h6" sx={{ mb: 2, color: '#1976d2', fontWeight: 700, textAlign: 'center' }}>Mesas</Typography>
+          <Box sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: 'repeat(2, 1fr)',
+              sm: 'repeat(3, 1fr)',
+              md: 'repeat(4, 1fr)',
+              lg: 'repeat(5, 1fr)'
+            },
+            gap: 2
+          }}>
+            {mesas.map((mesa, idx) => {
               const pedido = orders.find(o => o.mesa === mesa);
               const isSelected = mesaSeleccionada === mesa;
               const cliente = pedido?.cliente || '';
@@ -250,9 +238,9 @@ export default function Orders({ menuByDay, selectedDay }) {
               return (
                 <Paper
                   key={mesa}
-                  elevation={3}
+                  elevation={isSelected ? 8 : 3}
                   sx={{
-                    p: { xs: 1, sm: 2 },
+                    p: 2,
                     borderRadius: 3,
                     background: isSelected ? '#fffbe6' : '#fff',
                     boxShadow: isSelected ? '0 4px 16px #ffe082' : '0 2px 12px rgba(0,0,0,0.08)',
@@ -260,13 +248,16 @@ export default function Orders({ menuByDay, selectedDay }) {
                     flexDirection: 'column',
                     alignItems: 'center',
                     cursor: 'pointer',
-                    border: isSelected ? '2px solid #fbc02d' : '2px solid #e0e0e0',
-                    minHeight: { xs: 90, sm: 120 },
+                    border: isSelected ? '2.5px solid #fbc02d' : '2px solid #e0e0e0',
+                    minHeight: 100,
                     width: '100%',
-                    maxWidth: { xs: '100%', sm: 180, md: 200 },
+                    maxWidth: 200,
                     transition: 'box-shadow 0.2s, border 0.2s',
+                    mb: 1,
+                    position: 'relative',
                   }}
                   onClick={() => {
+                    setMesaSeleccionada(mesa);
                     if (tienePedido) {
                       setPedidoPopup(pedido);
                     } else {
@@ -280,34 +271,48 @@ export default function Orders({ menuByDay, selectedDay }) {
                         fecha: new Date().toISOString().slice(0, 16),
                         tabIndex: 0
                       });
-                      setMesaSeleccionada(mesa);
                     }
                   }}
                 >
-                    <TableRestaurantIcon sx={{ color: tienePedido ? '#fbc02d' : '#1976d2', fontSize: { xs: 28, sm: 36 }, mb: 1 }} />
-                    <Typography variant="body1" sx={{ fontWeight: 700, color: '#2d3a4a', textAlign: 'center', fontSize: { xs: 14, sm: 16 } }}>
-                      Mesa {mesa}
-                      {cliente && ` - ${cliente}`}
-                    </Typography>
+                  {/* Botón eliminar solo para mesas extra (no las 5 primeras) */}
+                  {idx >= 5 && (
+                    <IconButton
+                      size="small"
+                      sx={{ position: 'absolute', top: 6, right: 6, zIndex: 2, color: '#e53935', background: '#fff', boxShadow: 1 }}
+                      onClick={e => {
+                        e.stopPropagation();
+                        setMesas(mesas.filter((m, i) => i !== idx));
+                        // Eliminar pedido asociado si existe
+                        setOrders(orders.filter(o => o.mesa !== mesa));
+                      }}
+                    >
+                      <CancelIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                  <TableRestaurantIcon sx={{ color: tienePedido ? '#fbc02d' : '#1976d2', fontSize: 36, mb: 1 }} />
+                  <Typography variant="body1" sx={{ fontWeight: 700, color: '#2d3a4a', textAlign: 'center', fontSize: 16 }}>
+                    Mesa {mesa}
+                    {cliente && ` - ${cliente}`}
+                  </Typography>
                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
                     <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 1, width: '100%', mb: 0.5, mt: 1 }}>
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         {tienePlatillos
-                          ? <Chip label="Ocupada" color="error" size="small" sx={{ fontSize: { xs: 10, sm: 12 } }} />
-                          : <Chip label="Disponible" color="success" size="small" sx={{ fontSize: { xs: 10, sm: 12 } }} />}
+                          ? <Chip label="Ocupada" color="error" size="small" />
+                          : <Chip label="Disponible" color="success" size="small" />}
                       </Box>
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         {tienePlatillos
-                          ? <Chip label={estados.find(e => e.value === pedido.estado)?.label || 'Pendiente'} color={estados.find(e => e.value === pedido.estado)?.color || 'warning'} size="small" sx={{ fontSize: { xs: 10, sm: 12 } }} />
-                          : <Typography variant="caption" sx={{ color: '#bdbdbd', fontStyle: 'italic', fontSize: { xs: 10, sm: 12 } }}>Sin pedido</Typography>}
+                          ? <Chip label={estados.find(e => e.value === pedido.estado)?.label || 'Pendiente'} color={estados.find(e => e.value === pedido.estado)?.color || 'warning'} size="small" />
+                          : <Typography variant="caption" sx={{ color: '#bdbdbd', fontStyle: 'italic' }}>Sin pedido</Typography>}
                       </Box>
                     </Box>
                     <Button
                       size="small"
                       variant="outlined"
-                      sx={{ mb: 1, fontSize: { xs: 11, sm: 13 }, py: { xs: 0.5, sm: 1 }, px: { xs: 1, sm: 2 } }}
-                      onClick={e => { e.stopPropagation(); tienePedido && setPedidoPopup(pedido); }}
-                      disabled={!tienePedido}
+                      sx={{ mb: 1, fontSize: 13, py: 1, px: 2 }}
+                      onClick={e => { e.stopPropagation(); tienePedido && tienePlatillos && setPedidoPopup(pedido); }}
+                      disabled={!tienePedido || !tienePlatillos}
                     >
                       Ver pedido
                     </Button>
@@ -315,86 +320,45 @@ export default function Orders({ menuByDay, selectedDay }) {
                 </Paper>
               );
             })}
-          </Box>
-        </Box>
-        {/* Columna 2: Menú del día */}
-        <Box sx={{
-          flex: 2,
-          minWidth: { xs: '100%', sm: 320 },
-          maxWidth: { xs: '100%', md: 800 },
-          width: '100%',
-        }}>
-          {/* <Typography variant="h6" sx={{ mb: 2, color: '#1976d2', fontWeight: 700 }}>Menú del día ({selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)})</Typography> */}
-          {/* Tarjetas de platillos eliminadas, solo se muestra el pedido actual de la mesa seleccionada */}
-          {/* Mostrar pedido actual de la mesa seleccionada */}
-          {mesaSeleccionada && pedidoMesa && (
-            <Box
+            {/* Card para agregar nueva mesa */}
+            <Paper
+              key="add-mesa"
+              elevation={2}
               sx={{
-                mt: 4,
-                p: { xs: 1, sm: 2 },
-                background: '#fffbe6',
+                p: 2,
                 borderRadius: 3,
-                boxShadow: '0 2px 8px #ffe082',
-                border: '1px solid #fbc02d',
+                background: '#e3f2fd',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                border: '2px dashed #90caf9',
+                minHeight: 100,
                 width: '100%',
-                maxWidth: 420,
-                mx: { xs: 'auto', md: 0 },
+                maxWidth: 200,
+                transition: 'box-shadow 0.2s, border 0.2s',
+                mb: 1,
+              }}
+              onClick={() => {
+                let nextMesa = (parseInt(mesas[mesas.length - 1] || '0', 10) + 1).toString();
+                // Si ya existe, buscar el siguiente disponible
+                while (mesas.includes(nextMesa)) {
+                  nextMesa = (parseInt(nextMesa, 10) + 1).toString();
+                }
+                setMesas([...mesas, nextMesa]);
               }}
             >
-              <Typography variant="h6" sx={{ color: '#fbc02d', fontWeight: 700, mb: 1 }}>Pedido de Mesa {mesaSeleccionada}</Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <Typography variant="body2" sx={{ color: '#607d8b', mr: 1 }}>Cliente:</Typography>
-                <TextField
-                  size="small"
-                  variant="outlined"
-                  value={pedidoMesa.cliente || ''}
-                  onChange={e => setOrders(orders.map(o => o.mesa === mesaSeleccionada ? { ...o, cliente: e.target.value } : o))}
-                  placeholder="Nombre del cliente"
-                  sx={{ background: '#fff', borderRadius: 2, minWidth: 140 }}
-                />
-              </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2, width: '100%' }}>
-                {Array.isArray(pedidoMesa.platillos) ? pedidoMesa.platillos.map((p, idx) => {
-                  const platillo = menuByDay[selectedDay]?.find(m => m.name === p.name);
-                  return (
-                    <Paper
-                      key={idx}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        p: { xs: 0.5, sm: 1 },
-                        borderRadius: 2,
-                        background: '#fff',
-                        boxShadow: '0 1px 4px #ffe082',
-                        mb: 0.5,
-                        flexWrap: { xs: 'wrap', sm: 'nowrap' },
-                        width: '100%',
-                        minWidth: 0,
-                      }}
-                    >
-                      <Typography sx={{ minWidth: 70, fontWeight: 600, fontSize: { xs: 13, sm: 15 } }}>{p.name}</Typography>
-                      <Button size="small" onClick={() => handleCambiarCantidad(p.name, p.cantidad - 1)} sx={{ minWidth: 28, fontWeight: 700, px: 0 }}>-</Button>
-                      <Typography sx={{ mx: 1, minWidth: 20, textAlign: 'center', fontWeight: 600, fontSize: { xs: 13, sm: 15 } }}>{p.cantidad}</Typography>
-                      <Button size="small" onClick={() => handleCambiarCantidad(p.name, p.cantidad + 1)} sx={{ minWidth: 28, fontWeight: 700, px: 0 }}>+</Button>
-                      <Typography sx={{ ml: 2, minWidth: 48, color: '#388e3c', fontWeight: 600, fontSize: { xs: 13, sm: 15 } }}>
-                        ${platillo ? (platillo.price * p.cantidad).toFixed(2) : '0.00'}
-                      </Typography>
-                      <Button size="small" color="error" onClick={() => handleEliminarPlatillo(p.name)} sx={{ ml: 1, minWidth: 28, px: 0 }}>x</Button>
-                    </Paper>
-                  );
-                }) : null}
-              </Box>
-              <Typography variant="h6" sx={{ color: '#388e3c', fontWeight: 700, mb: 2, textAlign: 'right' }}>
-                Total: ${totalPedido.toFixed(2)}
+              <AddIcon sx={{ color: '#1976d2', fontSize: 36, mb: 1 }} />
+              <Typography variant="body1" sx={{ fontWeight: 700, color: '#1976d2', textAlign: 'center', fontSize: 16 }}>
+                Agregar mesa
               </Typography>
-              <TextField label="Notas (opcional)" value={pedidoMesa.notas || ''} onChange={e => setOrders(orders.map(o => o.mesa === mesaSeleccionada ? { ...o, notas: e.target.value } : o))} multiline minRows={2} maxRows={4} sx={{ mb: 2, background: '#fff', borderRadius: 2 }} />
-              <Button onClick={() => { setOrders(orders.filter(o => o.mesa !== mesaSeleccionada)); setSnackbar({ open: true, message: 'Pedido eliminado' }); }} color="error" sx={{ fontWeight: 600 }}>
-                <CancelIcon sx={{ mr: 1 }} /> Eliminar pedido
-              </Button>
-            </Box>
-          )}
-        </Box>
-      </Box>
+            </Paper>
+          </Box>
+        </Grid>
+        {/* Pedido (panel eliminado, solo se usa el popup) */}
+        <Grid item xs={12} md={8}></Grid>
+      </Grid>
       {/* Popup para ver pedido */}
       <Dialog open={!!pedidoPopup} onClose={() => setPedidoPopup(null)} maxWidth="xs" fullWidth PaperProps={{
         sx: {
