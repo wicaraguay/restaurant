@@ -332,7 +332,18 @@ export default function Orders({ menuByDay, selectedDay }) {
                     </Typography>
                   )}
                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-                    <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 1.2, width: '100%', mb: 1, mt: 1 }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 1.2,
+                        width: '100%',
+                        mb: 1,
+                        mt: 1
+                      }}
+                    >
                       <Chip
                         label={tienePlatillos ? 'Ocupada' : 'Disponible'}
                         color={tienePlatillos ? 'error' : 'success'}
@@ -340,7 +351,16 @@ export default function Orders({ menuByDay, selectedDay }) {
                         sx={{ fontWeight: 700, fontSize: 12, px: 1.2, borderRadius: 2, letterSpacing: 0.5, background: tienePlatillos ? '#fff3e0' : '#e3fcef', color: tienePlatillos ? '#d84315' : '#388e3c', border: '1px solid #ffe082' }}
                       />
                       {!tienePlatillos && (
-                        <Typography variant="caption" sx={{ color: '#bdbdbd', fontStyle: 'italic', fontSize: 13, ml: 1 }}>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: '#bdbdbd',
+                            fontStyle: 'italic',
+                            fontSize: 13,
+                            ml: { xs: 0, sm: 1 },
+                            mt: { xs: 0.5, sm: 0 }
+                          }}
+                        >
                           Sin pedido
                         </Typography>
                       )}
