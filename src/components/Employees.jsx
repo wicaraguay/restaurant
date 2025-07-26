@@ -278,52 +278,64 @@ function Employees({ roles, setRoles }) {
           maxWidth: { xs: '100%', sm: 600, md: 900, lg: 1200 },
           minHeight: { xs: 'auto', sm: 'calc(60vh - 32px)' },
           mx: 'auto',
-          px: { xs: 0.5, sm: 2, md: 3, lg: 4 },
+          px: { xs: 1.5, sm: 2, md: 3, lg: 4 },
           overflow: 'hidden',
         }}>
           {paginated.map(emp => {
             return (
               <Paper key={emp.id} elevation={6} sx={{
-                p: { xs: 1.2, sm: 3 },
+                p: { xs: 2, sm: 3 },
                 borderRadius: 5,
                 background: 'linear-gradient(135deg, #f8fafc 60%, #e0e7ef 100%)',
                 boxShadow: '0 4px 24px 0 #1976d222',
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: { xs: 'center', sm: 'center' },
-                minWidth: { xs: 0, sm: 200 },
-                maxWidth: { xs: 400, sm: 260 },
-                width: { xs: '98vw', sm: '100%' },
+                alignItems: 'center',
+                minWidth: { xs: 0, sm: 220 },
+                maxWidth: { xs: 420, sm: 270 },
+                width: { xs: '100%', sm: '100%' },
                 position: 'relative',
                 justifyContent: 'flex-start',
                 transition: 'transform 0.18s, box-shadow 0.18s',
-                textAlign: { xs: 'center', sm: 'initial' },
+                textAlign: 'center',
+                border: '1.5px solid #e3e7ef',
+                overflow: 'hidden',
+                mx: { xs: 'auto', sm: 0 },
+                mb: { xs: 1.5, sm: 0 },
                 '&:hover': {
                   transform: { xs: 'none', sm: 'translateY(-6px) scale(1.035)' },
                   boxShadow: { xs: '0 4px 24px 0 #1976d222', sm: '0 8px 32px 0 #1976d244' },
                   borderColor: '#1976d2',
                 },
               }}>
-                <Box sx={{ position: 'relative', mb: { xs: 1.2, sm: 2 } }}>
+                <Box sx={{
+                  width: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  mb: { xs: 1.2, sm: 2 },
+                  position: 'relative',
+                }}>
                   <Avatar
                     src={emp.photo}
                     alt={emp.name}
                     sx={{
-                      width: { xs: 64, sm: 72 },
-                      height: { xs: 64, sm: 72 },
+                      width: { xs: 70, sm: 80 },
+                      height: { xs: 70, sm: 80 },
                       bgcolor: '#e0e7ef',
                       fontWeight: 700,
-                      fontSize: { xs: 28, sm: 32 },
+                      fontSize: { xs: 30, sm: 36 },
                       border: '3px solid #1976d2',
                       boxShadow: '0 2px 12px #1976d222',
+                      mb: 0.5,
                     }}
                   >
                     {!emp.photo && emp.name.split(' ').map(n => n[0]).join('')}
                   </Avatar>
                   <Box sx={{
                     position: 'absolute',
-                    bottom: -8,
-                    right: -8,
+                    top: 6,
+                    right: 10,
                     zIndex: 2,
                   }}>
                     <Box sx={{
@@ -336,31 +348,45 @@ function Employees({ roles, setRoles }) {
                       background: emp.active ? '#43a047' : '#d32f2f',
                       boxShadow: '0 2px 8px #1976d222',
                       letterSpacing: 0.5,
+                      minWidth: 60,
+                      textAlign: 'center',
                     }}>{emp.active ? 'Activo' : 'Inactivo'}</Box>
                   </Box>
                 </Box>
-                <Typography variant="h6" sx={{ fontWeight: 800, color: '#2d3a4a', mb: 0.2, letterSpacing: 0.5, textAlign: 'center', fontSize: { xs: 17, sm: 20 } }}>{emp.name}</Typography>
-                <Typography variant="body2" sx={{ color: '#607d8b', mb: 0.2, fontWeight: 500, textAlign: 'center', fontSize: { xs: 13, sm: 14 } }}>Cédula: {emp.cedula}</Typography>
-                <Typography variant="body2" sx={{ color: '#1976d2', mb: 0.5, fontWeight: 700, textAlign: 'center', letterSpacing: 0.2, fontSize: { xs: 13, sm: 14 } }}>{typeof emp.role === 'object' ? emp.role.name : emp.role}</Typography>
+                <Typography variant="h6" sx={{ fontWeight: 800, color: '#2d3a4a', mb: 0.2, letterSpacing: 0.5, textAlign: 'center', fontSize: { xs: 18, sm: 21 } }}>{emp.name}</Typography>
+                <Typography variant="body2" sx={{ color: '#607d8b', mb: 0.2, fontWeight: 500, textAlign: 'center', fontSize: { xs: 13, sm: 15 } }}>Cédula: <b>{emp.cedula}</b></Typography>
+                <Typography variant="body2" sx={{ color: '#1976d2', mb: 0.5, fontWeight: 700, textAlign: 'center', letterSpacing: 0.2, fontSize: { xs: 13, sm: 15 } }}>{typeof emp.role === 'object' ? emp.role.name : emp.role}</Typography>
                 {/* Mostrar privilegios si existen, pero colapsados en móvil */}
                 {getPrivilegesForRole(emp.role).length > 0 && (
                   <Box sx={{ mb: 0.5, width: '100%' }}>
                     <Typography variant="caption" sx={{ color: '#1976d2', fontWeight: 600, textAlign: 'center', display: 'block', mb: 0.2, fontSize: { xs: 11, sm: 12 } }}>Privilegios:</Typography>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.3, justifyContent: 'center', maxHeight: { xs: 32, sm: 'none' }, overflow: { xs: 'hidden', sm: 'visible' } }}>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: 'center', maxHeight: { xs: 40, sm: 'none' }, overflow: { xs: 'hidden', sm: 'visible' } }}>
                       {getPrivilegesForRole(emp.role).slice(0, 3).map((priv, idx) => (
-                        <Typography key={idx} variant="caption" sx={{ background: '#e3f2fd', color: '#1976d2', px: 0.7, py: 0.2, borderRadius: 1, fontWeight: 500, fontSize: { xs: 10, sm: 12 } }}>{priv}</Typography>
+                        <Typography key={idx} variant="caption" sx={{ background: '#e3f2fd', color: '#1976d2', px: 1, py: 0.3, borderRadius: 1, fontWeight: 500, fontSize: { xs: 10.5, sm: 12 } }}>{priv}</Typography>
                       ))}
                       {getPrivilegesForRole(emp.role).length > 3 && (
-                        <Typography variant="caption" sx={{ color: '#1976d2', fontWeight: 600, fontSize: { xs: 10, sm: 12 } }}>+{getPrivilegesForRole(emp.role).length - 3} más</Typography>
+                        <Typography variant="caption" sx={{ color: '#1976d2', fontWeight: 600, fontSize: { xs: 10.5, sm: 12 } }}>+{getPrivilegesForRole(emp.role).length - 3} más</Typography>
                       )}
                     </Box>
                   </Box>
                 )}
-                <Typography variant="body2" sx={{ color: '#607d8b', mb: 0.5, fontWeight: 500, textAlign: 'center', fontSize: { xs: 13, sm: 14 } }}>Tel: {emp.phone}</Typography>
+                <Typography variant="body2" sx={{ color: '#607d8b', mb: 0.5, fontWeight: 500, textAlign: 'center', fontSize: { xs: 13, sm: 14 } }}>Tel: <b>{emp.phone}</b></Typography>
                 {emp.notes && (
-                  <Typography variant="body2" sx={{ color: '#8d5524', mb: 0.5, fontStyle: 'italic', textAlign: 'center', px: 1, fontWeight: 500, fontSize: { xs: 12, sm: 13 } }}>
-                    {emp.notes}
-                  </Typography>
+                  <Box sx={{
+                    width: '100%',
+                    background: 'rgba(255, 236, 179, 0.5)',
+                    borderRadius: 2,
+                    px: 1.2,
+                    py: 0.7,
+                    mb: 0.7,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    <Typography variant="body2" sx={{ color: '#8d5524', fontStyle: 'italic', fontWeight: 500, fontSize: { xs: 12.5, sm: 13.5 } }}>
+                      {emp.notes}
+                    </Typography>
+                  </Box>
                 )}
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1, mt: 0.5 }}>
                   <Switch

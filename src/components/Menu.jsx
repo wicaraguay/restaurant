@@ -329,20 +329,20 @@ export default function Menu({ categories, setCategories, menuByDay, setMenuByDa
       <Box sx={{
         display: 'grid',
         gridTemplateColumns: {
-          xs: 'repeat(2, 1fr)',
+          xs: '1fr',
           sm: 'repeat(2, 1fr)',
           md: 'repeat(3, 1fr)',
           lg: 'repeat(4, 1fr)',
           xl: 'repeat(5, 1fr)'
         },
-        gap: { xs: 2, sm: 3 },
+        gap: { xs: 2.5, sm: 3 },
         mt: 0,
         mb: 0,
         width: '100%',
         maxWidth: { xs: '100%', sm: 600, md: 900, lg: 1200 },
         minHeight: { xs: 'auto', sm: 'calc(60vh - 32px)' },
         mx: 'auto',
-        px: { xs: 1, sm: 2, md: 3, lg: 4 },
+        px: { xs: 1.5, sm: 2, md: 3, lg: 4 },
         overflow: 'hidden',
       }}>
         {paginated.map(item => (
@@ -350,20 +350,22 @@ export default function Menu({ categories, setCategories, menuByDay, setMenuByDa
             key={item.id}
             elevation={3}
             sx={{
-              p: { xs: 2, sm: 2.5 },
+              p: { xs: 2.2, sm: 2.5 },
               borderRadius: 4,
               background: '#fff',
               boxShadow: '0 4px 18px 0 #e0e7efcc',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'stretch',
-              minWidth: { xs: 140, sm: 180 },
-              maxWidth: { xs: 180, sm: 220 },
-              width: '100%',
+              minWidth: { xs: 0, sm: 180 },
+              maxWidth: { xs: 500, sm: 220 },
+              width: { xs: '100%', sm: '100%' },
               height: '100%',
               position: 'relative',
               border: '1.5px solid #e0e7ef',
               transition: 'box-shadow 0.2s, border 0.2s',
+              mx: { xs: 'auto', sm: 0 },
+              mb: { xs: 1.5, sm: 0 },
               '&:hover': {
                 boxShadow: '0 8px 32px 0 #90caf944',
                 border: '2px solid #90caf9',
