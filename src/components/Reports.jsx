@@ -13,7 +13,10 @@ import {
   FormControl,
   InputLabel,
   TextField,
-  Divider
+  Divider,
+  Chip,
+  Stack,
+  useTheme
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -26,6 +29,7 @@ import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
 // Aquí se deja la estructura lista para integrar
 
 export default function Reports({ orders = [], menuByDay = {}, empleados = [] }) {
+  const theme = useTheme();
   const [tab, setTab] = useState(0);
   const [filtros, setFiltros] = useState({
     fechaInicio: '',
@@ -167,7 +171,7 @@ export default function Reports({ orders = [], menuByDay = {}, empleados = [] })
         mx: 'auto',
       }}
     >
-      <Typography variant="h4" sx={{ mb: 3, fontWeight: 700, textAlign: 'center', color: '#2d3a4a' }}>Reportes</Typography>
+      <Typography variant="h4" sx={{ mb: 3, fontWeight: 700, textAlign: 'center', color: '#2d3a4a', letterSpacing: 1 }}>Reportes</Typography>
       <Tabs
         value={tab}
         onChange={(_, v) => setTab(v)}
@@ -195,6 +199,9 @@ export default function Reports({ orders = [], menuByDay = {}, empleados = [] })
           alignItems: 'center',
           justifyContent: 'center',
           flexDirection: { xs: 'column', sm: 'row' },
+          boxShadow: 3,
+          borderRadius: 3,
+          background: 'linear-gradient(135deg, #fffde7 60%, #e3f2fd 100%)',
         }}
       >
         <FormControl size="small" sx={{ minWidth: 120 }}>
@@ -235,103 +242,137 @@ export default function Reports({ orders = [], menuByDay = {}, empleados = [] })
         <Button variant="outlined" startIcon={<DownloadIcon />} onClick={() => handleExport('PDF')}>Exportar PDF</Button>
         <Button variant="outlined" startIcon={<DownloadIcon />} onClick={() => handleExport('Excel')}>Exportar Excel</Button>
       </Paper>
-      {/* Contenido de cada tab */}
-      {tab === 0 && (
-        <Box>
-          <Typography variant="h6" sx={{ mb: 2 }}>Ventas por {filtros.periodo}</Typography>
-          <ResponsiveContainer width="100%" height={window.innerWidth < 600 ? 220 : 300} minWidth={0} minHeight={0}>
-            <BarChart data={ventasData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="periodo" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="total" fill="#1976d2" name="Total ventas" />
-              <Bar dataKey="pedidos" fill="#ffc107" name="Pedidos" />
-            </BarChart>
-          </ResponsiveContainer>
-          <pre style={{ background: '#fff', padding: 12, borderRadius: 8, fontSize: 14, marginTop: 16 }}>{JSON.stringify(ventasPorPeriodo, null, 2)}</pre>
-        </Box>
-      )}
-      {tab === 1 && (
-        <Box>
-          <Typography variant="h6" sx={{ mb: 2 }}>Ranking de platillos más vendidos</Typography>
-          <ResponsiveContainer width="100%" height={window.innerWidth < 600 ? 220 : 300} minWidth={0} minHeight={0}>
-            <PieChart>
-              <Pie data={platillosData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={110} label>
-                {platillosData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-          <pre style={{ background: '#fff', padding: 12, borderRadius: 8, fontSize: 14, marginTop: 16 }}>{JSON.stringify(rankingPlatillos, null, 2)}</pre>
-        </Box>
-      )}
-      {tab === 2 && (
-        <Box>
-          <Typography variant="h6" sx={{ mb: 2 }}>Mesas más ocupadas</Typography>
-          <ResponsiveContainer width="100%" height={window.innerWidth < 600 ? 220 : 300} minWidth={0} minHeight={0}>
-            <BarChart data={mesasData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis allowDecimals={false} />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="value" fill="#1976d2" name="Veces ocupada" />
-            </BarChart>
-          </ResponsiveContainer>
-          <pre style={{ background: '#fff', padding: 12, borderRadius: 8, fontSize: 14, marginTop: 16 }}>{JSON.stringify(mesasOcupadas, null, 2)}</pre>
-        </Box>
-      )}
-      {tab === 3 && (
-        <Box>
-          <Typography variant="h6" sx={{ mb: 2 }}>Ingresos por empleado</Typography>
-          <ResponsiveContainer width="100%" height={window.innerWidth < 600 ? 220 : 300} minWidth={0} minHeight={0}>
-            <BarChart data={empleadosData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="value" fill="#388e3c" name="Ingresos" />
-            </BarChart>
-          </ResponsiveContainer>
-          <pre style={{ background: '#fff', padding: 12, borderRadius: 8, fontSize: 14, marginTop: 16 }}>{JSON.stringify(ingresosPorEmpleado, null, 2)}</pre>
-        </Box>
-      )}
-      {tab === 4 && (
-        <Box>
-          <Typography variant="h6" sx={{ mb: 2 }}>Pedidos cancelados y modificados</Typography>
-          <ResponsiveContainer width="100%" height={window.innerWidth < 600 ? 220 : 300} minWidth={0} minHeight={0}>
-            <PieChart>
-              <Pie data={canceladosData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={110} label>
-                {canceladosData.map((entry, index) => (
-                  <Cell key={`cell-cancelados-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-          <Typography variant="subtitle2">Cancelados:</Typography>
-          <pre style={{ background: '#fff', padding: 12, borderRadius: 8, fontSize: 14 }}>{JSON.stringify(pedidosCancelados, null, 2)}</pre>
-          <Typography variant="subtitle2">Modificados:</Typography>
-          <pre style={{ background: '#fff', padding: 12, borderRadius: 8, fontSize: 14 }}>{JSON.stringify(pedidosModificados, null, 2)}</pre>
-        </Box>
-      )}
-      {tab === 5 && (
-        <Box>
-          <Typography variant="h6" sx={{ mb: 2 }}>Comparativa de ventas</Typography>
-          {/* Aquí puedes renderizar una gráfica y tabla */}
-          <pre style={{ background: '#fff', padding: 12, borderRadius: 8, fontSize: 14 }}>{JSON.stringify(comparativaVentas, null, 2)}</pre>
-        </Box>
-      )}
+
+      {/* Contenido de cada tab, ahora en tarjetas Paper modernas y responsivas */}
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 3 }}>
+        {tab === 0 && (
+          <Paper elevation={4} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 4, boxShadow: 6, background: 'linear-gradient(135deg, #fffde7 60%, #ffe082 100%)', mb: 2 }}>
+            <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+              <BarChartIcon color="primary" sx={{ fontSize: 32 }} />
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>Ventas por {filtros.periodo}</Typography>
+              <Chip label={`Total: $${ventasData.reduce((a, b) => a + b.total, 0).toFixed(2)}`} color="primary" sx={{ fontWeight: 700 }} />
+              <Chip label={`Pedidos: ${ventasData.reduce((a, b) => a + b.pedidos, 0)}`} color="warning" sx={{ fontWeight: 700 }} />
+            </Stack>
+            <ResponsiveContainer width="100%" height={window.innerWidth < 600 ? 220 : 300} minWidth={0} minHeight={0}>
+              <BarChart data={ventasData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="periodo" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="total" fill="#1976d2" name="Total ventas" />
+                <Bar dataKey="pedidos" fill="#ffc107" name="Pedidos" />
+              </BarChart>
+            </ResponsiveContainer>
+          </Paper>
+        )}
+        {tab === 1 && (
+          <Paper elevation={4} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 4, boxShadow: 6, background: 'linear-gradient(135deg, #e3f2fd 60%, #bbdefb 100%)', mb: 2 }}>
+            <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+              <RestaurantMenuIcon color="primary" sx={{ fontSize: 32 }} />
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>Platillos más vendidos</Typography>
+              {platillosData[0] && <Chip label={`Top: ${platillosData[0].name}`} color="success" sx={{ fontWeight: 700 }} />}
+            </Stack>
+            <ResponsiveContainer width="100%" height={window.innerWidth < 600 ? 220 : 300} minWidth={0} minHeight={0}>
+              <PieChart>
+                <Pie data={platillosData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={110} label>
+                  {platillosData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </Paper>
+        )}
+        {tab === 2 && (
+          <Paper elevation={4} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 4, boxShadow: 6, background: 'linear-gradient(135deg, #f8fafc 60%, #e0e7ef 100%)', mb: 2 }}>
+            <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+              <TableRestaurantIcon color="primary" sx={{ fontSize: 32 }} />
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>Mesas más ocupadas</Typography>
+              {mesasData[0] && <Chip label={`Top: ${mesasData[0].name}`} color="info" sx={{ fontWeight: 700 }} />}
+            </Stack>
+            <ResponsiveContainer width="100%" height={window.innerWidth < 600 ? 220 : 300} minWidth={0} minHeight={0}>
+              <BarChart data={mesasData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="value" fill="#1976d2" name="Veces ocupada" />
+              </BarChart>
+            </ResponsiveContainer>
+          </Paper>
+        )}
+        {tab === 3 && (
+          <Paper elevation={4} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 4, boxShadow: 6, background: 'linear-gradient(135deg, #e8f5e9 60%, #c8e6c9 100%)', mb: 2 }}>
+            <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+              <PeopleIcon color="primary" sx={{ fontSize: 32 }} />
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>Ingresos por empleado</Typography>
+              {empleadosData[0] && <Chip label={`Top: ${empleadosData[0].name}`} color="success" sx={{ fontWeight: 700 }} />}
+            </Stack>
+            <ResponsiveContainer width="100%" height={window.innerWidth < 600 ? 220 : 300} minWidth={0} minHeight={0}>
+              <BarChart data={empleadosData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="value" fill="#388e3c" name="Ingresos" />
+              </BarChart>
+            </ResponsiveContainer>
+          </Paper>
+        )}
+        {tab === 4 && (
+          <Paper elevation={4} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 4, boxShadow: 6, background: 'linear-gradient(135deg, #fffde7 60%, #ffe082 100%)', mb: 2 }}>
+            <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+              <PieChartIcon color="primary" sx={{ fontSize: 32 }} />
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>Pedidos cancelados y modificados</Typography>
+              <Chip label={`Cancelados: ${pedidosCancelados.length}`} color="error" sx={{ fontWeight: 700 }} />
+              <Chip label={`Modificados: ${pedidosModificados.length}`} color="warning" sx={{ fontWeight: 700 }} />
+            </Stack>
+            <ResponsiveContainer width="100%" height={window.innerWidth < 600 ? 220 : 300} minWidth={0} minHeight={0}>
+              <PieChart>
+                <Pie data={canceladosData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={110} label>
+                  {canceladosData.map((entry, index) => (
+                    <Cell key={`cell-cancelados-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </Paper>
+        )}
+        {tab === 5 && (
+          <Paper elevation={4} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 4, boxShadow: 6, background: 'linear-gradient(135deg, #e3f2fd 60%, #bbdefb 100%)', mb: 2 }}>
+            <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+              <BarChartIcon color="primary" sx={{ fontSize: 32 }} />
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>Comparativa de ventas</Typography>
+            </Stack>
+            <ResponsiveContainer width="100%" height={window.innerWidth < 600 ? 220 : 300} minWidth={0} minHeight={0}>
+              <BarChart data={ventasData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="periodo" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="total" fill="#1976d2" name="Total ventas" />
+                <Bar dataKey="pedidos" fill="#ffc107" name="Pedidos" />
+              </BarChart>
+            </ResponsiveContainer>
+          </Paper>
+        )}
+      </Box>
+
+      {/* Horarios pico, siempre visible al final */}
       <Divider sx={{ my: 4 }} />
-      <Box>
-        <Typography variant="h6" sx={{ mb: 2 }}>Horarios pico</Typography>
+      <Paper elevation={4} sx={{ p: { xs: 2, sm: 3 }, borderRadius: 4, boxShadow: 6, background: 'linear-gradient(135deg, #ede7f6 60%, #e1bee7 100%)', mb: 2 }}>
+        <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+          <BarChartIcon color="primary" sx={{ fontSize: 32 }} />
+          <Typography variant="h6" sx={{ fontWeight: 700 }}>Horarios pico</Typography>
+        </Stack>
         <ResponsiveContainer width="100%" height={window.innerWidth < 600 ? 220 : 300} minWidth={0} minHeight={0}>
           <BarChart data={horariosData}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -342,8 +383,7 @@ export default function Reports({ orders = [], menuByDay = {}, empleados = [] })
             <Bar dataKey="value" fill="#7b1fa2" name="Pedidos" />
           </BarChart>
         </ResponsiveContainer>
-        <pre style={{ background: '#fff', padding: 12, borderRadius: 8, fontSize: 14, marginTop: 16 }}>{JSON.stringify(horariosPico, null, 2)}</pre>
-      </Box>
+      </Paper>
     </Box>
   );
 }
