@@ -121,6 +121,9 @@ export default function DashboardFull({
           display: 'flex',
           alignItems: 'center',
         }}
+        role="region"
+        aria-label="Resumen de tarjetas del dashboard"
+        tabIndex={0}
       >
         {/* Flecha izquierda */}
         {total > visible && (
@@ -138,11 +141,16 @@ export default function DashboardFull({
             transition: 'transform 0.7s cubic-bezier(.4,1.3,.6,1)',
             willChange: 'transform',
           }}
+          role="list"
+          aria-label="Tarjetas resumen"
         >
           {cards.map((card, idx) => (
             <Paper
               key={idx}
               elevation={4}
+              tabIndex={0}
+              aria-label={`${card.title}: ${card.value}`}
+              role="listitem"
               sx={{
                 minWidth: 180,
                 maxWidth: 210,
@@ -157,20 +165,28 @@ export default function DashboardFull({
                 boxShadow: '0 4px 24px 0 #1976d222',
                 position: 'relative',
                 transition: 'transform 0.15s, box-shadow 0.15s',
-                '&:hover': {
+                outline: 'none',
+                fontSize: { xs: 16, sm: 18 },
+                '&:hover, &:focus': {
                   transform: 'translateY(-4px) scale(1.03)',
                   boxShadow: '0 8px 32px 0 #1976d244',
+                  border: '2.5px solid #1976d2',
                 },
               }}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  // Acción accesible, por ejemplo, mostrar detalles
+                }
+              }}
             >
-              <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.92)', color: '#1976d2', width: 44, height: 44, boxShadow: '0 2px 8px #1976d222', fontSize: 26 }}>
+              <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.92)', color: '#1976d2', width: 44, height: 44, boxShadow: '0 2px 8px #1976d222', fontSize: 28 }}>
                 {card.icon}
               </Avatar>
               <Box>
-                <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 600, letterSpacing: 0.5, textShadow: '0 1px 4px #0002', fontSize: 14 }}>{card.title}</Typography>
-                <Typography variant="h5" sx={{ fontWeight: 900, color: '#fff', textShadow: '0 2px 8px #0002', letterSpacing: 1, fontSize: 22 }}>{card.value}</Typography>
+                <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 600, letterSpacing: 0.5, textShadow: '0 1px 4px #0002', fontSize: 16 }}>{card.title}</Typography>
+                <Typography variant="h5" sx={{ fontWeight: 900, color: '#fff', textShadow: '0 2px 8px #0002', letterSpacing: 1, fontSize: 24 }}>{card.value}</Typography>
               </Box>
-              <Chip label={card.badge} size="small" sx={{ position: 'absolute', top: 8, right: 8, bgcolor: 'rgba(255,255,255,0.85)', color: '#1976d2', fontWeight: 700, fontSize: 12, letterSpacing: 0.5 }} />
+              <Chip label={card.badge} size="small" sx={{ position: 'absolute', top: 8, right: 8, bgcolor: 'rgba(255,255,255,0.85)', color: '#1976d2', fontWeight: 700, fontSize: 13, letterSpacing: 0.5 }} />
             </Paper>
           ))}
         </Box>

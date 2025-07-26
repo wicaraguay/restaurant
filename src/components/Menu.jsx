@@ -273,7 +273,7 @@ export default function Menu({ categories, setCategories, menuByDay, setMenuByDa
     <Box sx={{ width: '100%', minHeight: 'calc(100vh - 64px)', background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%)', fontFamily: 'Montserrat, Arial, sans-serif', p: { xs: 2, sm: 3, md: 4 } }}>
       <Typography variant="h4" sx={{ mb: 4, fontWeight: 700, textAlign: 'center', color: '#2d3a4a', letterSpacing: 1 }}>Gestión de Menú</Typography>
       {/* CategoryManager removed: now managed via navigation, not inside Menu */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 4, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
+      <Box sx={{ display: 'flex', gap: 2, mb: 4, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }} role="region" aria-label="Controles de menú" tabIndex={0}>
         <FormControl sx={{ minWidth: 160, background: '#fff', borderRadius: 2 }}>
           <InputLabel id="day-label">Día</InputLabel>
           <Select
@@ -304,7 +304,7 @@ export default function Menu({ categories, setCategories, menuByDay, setMenuByDa
         </Button>
       </Box>
       {/* Paginación */}
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2, mb: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2, mb: 2 }} role="navigation" aria-label="Paginación de menú" tabIndex={0}>
         <Button
           variant="outlined"
           size="small"
@@ -344,15 +344,18 @@ export default function Menu({ categories, setCategories, menuByDay, setMenuByDa
         mx: 'auto',
         px: { xs: 1.5, sm: 2, md: 3, lg: 4 },
         overflow: 'hidden',
-      }}>
+      }} role="list" aria-label="Lista de platillos disponibles">
         {paginated.map(item => (
           <Paper
             key={item.id}
             elevation={3}
+            tabIndex={0}
+            aria-label={`Platillo ${item.name}, ${item.active ? 'disponible' : 'no disponible'}, ${item.special ? 'especial' : 'normal'}`}
+            role="listitem"
             sx={{
               p: { xs: 2.2, sm: 2.5 },
               borderRadius: 4,
-              background: '#fff',
+              background: item.active ? '#fff' : '#f8bbd0',
               boxShadow: '0 4px 18px 0 #e0e7efcc',
               display: 'flex',
               flexDirection: 'column',
@@ -362,14 +365,22 @@ export default function Menu({ categories, setCategories, menuByDay, setMenuByDa
               width: { xs: '100%', sm: '100%' },
               height: '100%',
               position: 'relative',
-              border: '1.5px solid #e0e7ef',
+              border: item.active ? '2px solid #1976d2' : '2px solid #b71c1c',
               transition: 'box-shadow 0.2s, border 0.2s',
               mx: { xs: 'auto', sm: 0 },
               mb: { xs: 1.5, sm: 0 },
-              '&:hover': {
+              outline: 'none',
+              fontSize: { xs: 16, sm: 17 },
+              '&:hover, &:focus': {
                 boxShadow: '0 8px 32px 0 #90caf944',
-                border: '2px solid #90caf9',
+                border: '2.5px solid #1976d2',
+                background: item.active ? '#e3f2fd' : '#ffcdd2',
               },
+            }}
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleOpen(item);
+              }
             }}
           >
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 1, width: '100%' }}>
@@ -380,18 +391,18 @@ export default function Menu({ categories, setCategories, menuByDay, setMenuByDa
               >
                 {!item.photo && item.name.split(' ').map(n => n[0]).join('')}
               </Avatar>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: '#263238', fontSize: 17, mb: 0.5, letterSpacing: 0.2, lineHeight: 1.1, textAlign: 'center', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</Typography>
-              <Typography variant="body2" sx={{ color: '#607d8b', fontWeight: 500, fontSize: 13, textAlign: 'center', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.category}</Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: '#263238', fontSize: { xs: 18, sm: 20 }, mb: 0.5, letterSpacing: 0.2, lineHeight: 1.1, textAlign: 'center', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</Typography>
+              <Typography variant="body2" sx={{ color: '#607d8b', fontWeight: 500, fontSize: 15, textAlign: 'center', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.category}</Typography>
               {item.subcategory && (
                 <Typography variant="caption" sx={{ color: '#90caf9', fontWeight: 600, fontSize: 11, textAlign: 'center' }}>{item.subcategory}</Typography>
               )}
             </Box>
-            <Typography variant="body2" sx={{ color: '#37474f', mb: 1, fontWeight: 500, fontSize: 14, textAlign: 'center', minHeight: 32, maxHeight: 36, overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.description}</Typography>
-            <Typography variant="subtitle1" sx={{ color: '#1976d2', fontWeight: 900, fontSize: 17, textAlign: 'center', mb: 1 }}>
+            <Typography variant="body2" sx={{ color: '#37474f', mb: 1, fontWeight: 500, fontSize: 15, textAlign: 'center', minHeight: 32, maxHeight: 36, overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.description}</Typography>
+            <Typography variant="subtitle1" sx={{ color: '#1976d2', fontWeight: 900, fontSize: 19, textAlign: 'center', mb: 1 }}>
               $ {item.price}
             </Typography>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1, mb: 1, width: '100%' }}>
-              <Button size="small" variant={item.active ? 'contained' : 'outlined'} color={item.active ? 'success' : 'error'} sx={{ fontWeight: 700, fontSize: 11, px: 1.5, py: 0.2, borderRadius: 2, minWidth: 0, boxShadow: 'none', textTransform: 'none' }}>
+              <Button size="small" variant={item.active ? 'contained' : 'outlined'} color={item.active ? 'success' : 'error'} sx={{ fontWeight: 700, fontSize: 13, px: 1.5, py: 0.2, borderRadius: 2, minWidth: 0, boxShadow: 'none', textTransform: 'none' }} aria-label={item.active ? 'Platillo disponible' : 'Platillo no disponible'}>
                 {item.active ? 'Disponible' : 'No disponible'}
               </Button>
               <Switch
@@ -399,10 +410,11 @@ export default function Menu({ categories, setCategories, menuByDay, setMenuByDa
                 onChange={() => handleToggleActive(item.id)}
                 color="success"
                 sx={{ ml: 0.5 }}
+                inputProps={{ 'aria-label': 'Cambiar disponibilidad del platillo' }}
               />
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1, mb: 1, width: '100%' }}>
-              <Button size="small" variant={item.special ? 'contained' : 'outlined'} color="warning" sx={{ fontWeight: 700, fontSize: 11, px: 1.5, py: 0.2, borderRadius: 2, minWidth: 0, boxShadow: 'none', textTransform: 'none' }}>
+              <Button size="small" variant={item.special ? 'contained' : 'outlined'} color="warning" sx={{ fontWeight: 700, fontSize: 13, px: 1.5, py: 0.2, borderRadius: 2, minWidth: 0, boxShadow: 'none', textTransform: 'none' }} aria-label={item.special ? 'Platillo especial' : 'Platillo normal'}>
                 {item.special ? 'Especial' : 'Normal'}
               </Button>
               <Switch
@@ -410,11 +422,13 @@ export default function Menu({ categories, setCategories, menuByDay, setMenuByDa
                 onChange={() => handleToggleSpecial(item.id)}
                 color="warning"
                 sx={{ ml: 0.5 }}
+                inputProps={{ 'aria-label': 'Cambiar tipo de platillo' }}
               />
             </Box>
             <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', gap: 1, mt: 'auto', pt: 1 }}>
               <IconButton
                 color="primary"
+                aria-label={`Editar platillo ${item.name}`}
                 onClick={e => {
                   e.stopPropagation();
                   handleOpen(item);
@@ -422,10 +436,10 @@ export default function Menu({ categories, setCategories, menuByDay, setMenuByDa
               >
                 <EditIcon />
               </IconButton>
-              <IconButton color="secondary" onClick={() => { setHistoryData(item.history || []); setHistoryOpen(true); }}>
+              <IconButton color="secondary" aria-label={`Ver historial de ${item.name}`} onClick={() => { setHistoryData(item.history || []); setHistoryOpen(true); }}>
                 <span role="img" aria-label="Historial">🕑</span>
               </IconButton>
-              <IconButton color="error" onClick={() => handleDeleteRequest(item.id)}>
+              <IconButton color="error" aria-label={`Eliminar platillo ${item.name}`} onClick={() => handleDeleteRequest(item.id)}>
                 <DeleteIcon />
               </IconButton>
             </Box>

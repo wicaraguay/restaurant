@@ -244,6 +244,9 @@ export default function Orders({ menuByDay, selectedDay }) {
                 <Paper
                   key={mesa}
                   elevation={isSelected ? 12 : 4}
+                  tabIndex={0}
+                  aria-label={`Mesa ${mesa}${tienePlatillos ? ', ocupada' : ', disponible'}`}
+                  role="button"
                   sx={{
                     p: { xs: 1.2, sm: 2.5 },
                     borderRadius: { xs: 3, sm: 4 },
@@ -257,7 +260,7 @@ export default function Orders({ menuByDay, selectedDay }) {
                     flexDirection: 'column',
                     alignItems: 'center',
                     cursor: 'pointer',
-                    border: isSelected ? '2.5px solid #fbc02d' : '2px solid #e0e0e0',
+                    border: isSelected ? '2.5px solid #fbc02d' : '2px solid #333', // Mejor contraste
                     minHeight: { xs: 100, sm: 120 },
                     width: '100%',
                     maxWidth: '100%',
@@ -265,7 +268,8 @@ export default function Orders({ menuByDay, selectedDay }) {
                     mb: { xs: 1, sm: 1.5 },
                     position: 'relative',
                     boxSizing: 'border-box',
-                    '&:hover': {
+                    outline: 'none',
+                    '&:hover, &:focus': {
                       boxShadow: '0 8px 32px 0 #ffe082, 0 2px 12px 0 #fbc02d44',
                       border: '2.5px solid #fbc02d',
                       background: 'linear-gradient(135deg, #fffde7 60%, #ffe082 100%)',
@@ -286,6 +290,25 @@ export default function Orders({ menuByDay, selectedDay }) {
                         fecha: new Date().toISOString().slice(0, 16),
                         tabIndex: 0
                       });
+                    }
+                  }}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      setMesaSeleccionada(mesa);
+                      if (tienePedido) {
+                        setPedidoPopup(pedido);
+                      } else {
+                        setPedidoPopup({
+                          id: null,
+                          mesa,
+                          cliente: '',
+                          platillos: [],
+                          estado: 'pendiente',
+                          notas: '',
+                          fecha: new Date().toISOString().slice(0, 16),
+                          tabIndex: 0
+                        });
+                      }
                     }
                   }}
                 >
@@ -321,10 +344,8 @@ export default function Orders({ menuByDay, selectedDay }) {
                   }}>
                     <TableRestaurantIcon sx={{ color: tienePlatillos ? '#fbc02d' : '#1976d2', fontSize: { xs: 26, sm: 34 } }} />
                   </Box>
-                  <Typography variant="h6" sx={{ fontWeight: 800, color: '#2d3a4a', textAlign: 'center', fontSize: 18, letterSpacing: 1, mb: 0.5 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#2d3a4a', textAlign: 'center', fontSize: { xs: 15, sm: 18 }, letterSpacing: 1, mb: { xs: 0.2, sm: 0.5 } }}>
-                      Mesa {mesa}
-                    </Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 800, color: '#1a237e', textAlign: 'center', fontSize: { xs: 18, sm: 20 }, letterSpacing: 1, mb: 0.5 }}>
+                    Mesa {mesa}
                   </Typography>
                   {cliente && (
                     <Typography variant="body2" sx={{ color: '#607d8b', fontWeight: 500, textAlign: 'center', fontSize: 14, mb: 0.5, maxWidth: '90%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: 0.2 }}>
@@ -371,23 +392,32 @@ export default function Orders({ menuByDay, selectedDay }) {
                       color={tienePlatillos ? 'warning' : 'primary'}
                       sx={{
                         mb: 0.5,
-                        fontSize: 14,
-                        py: 1,
-                        px: 2.5,
+                        fontSize: 16,
+                        py: 1.2,
+                        px: 3,
                         fontWeight: 700,
                         borderRadius: 2.5,
                         boxShadow: tienePlatillos ? '0 2px 8px #ffe08288' : 'none',
                         letterSpacing: 0.5,
                         background: tienePlatillos ? 'linear-gradient(90deg, #ffe082 60%, #ffd54f 100%)' : undefined,
-                        color: tienePlatillos ? '#6d4c00' : undefined,
-                        border: tienePlatillos ? '1.5px solid #ffd54f' : undefined,
+                        color: tienePlatillos ? '#212121' : undefined,
+                        border: tienePlatillos ? '2px solid #ffd54f' : undefined,
                         transition: 'all 0.2s',
-                        '&:hover': {
+                        outline: 'none',
+                        '&:hover, &:focus': {
                           background: tienePlatillos ? 'linear-gradient(90deg, #ffd54f 60%, #ffe082 100%)' : undefined,
-                          color: tienePlatillos ? '#4e3400' : undefined,
+                          color: tienePlatillos ? '#212121' : undefined,
+                          border: tienePlatillos ? '2.5px solid #fbc02d' : undefined,
                         },
                       }}
+                      tabIndex={0}
+                      aria-label={tienePlatillos ? `Ver pedido de mesa ${mesa}` : `Sin pedido en mesa ${mesa}`}
                       onClick={e => { e.stopPropagation(); tienePedido && tienePlatillos && setPedidoPopup(pedido); }}
+                      onKeyDown={e => {
+                        if ((e.key === 'Enter' || e.key === ' ') && tienePedido && tienePlatillos) {
+                          setPedidoPopup(pedido);
+                        }
+                      }}
                       disabled={!tienePedido || !tienePlatillos}
                     >
                       Ver pedido
